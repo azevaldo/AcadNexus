@@ -10,7 +10,7 @@ class Campanha extends Model
 
     protected $fillable = [
         'curso_id','coordenador_id','titulo','descricao',
-        'prazo_submissao','prazo_melhorias','prazo_novo','status'
+        'prazo_submissao','prazo_melhorias','status'
     ];
 
     

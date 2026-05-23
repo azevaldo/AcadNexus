@@ -1,10 +1,9 @@
-@extends('app.private.auth.app')
+ @extends('app.private.auth.app')
 
 @section('content')
 
 <div class="max-w-md w-full relative">
 
-    <!-- HEADER -->
     <div class="text-center mb-10">
         <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-700 text-white rounded-2xl shadow-lg mb-4">
             <i class="fas fa-university text-2xl"></i>
@@ -15,13 +14,11 @@
         </p>
     </div>
 
-    <!-- CARD -->
     <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white p-8 md:p-10">
 
         <form method="POST" action="{{ route('login') }}" class="space-y-6">
             @csrf
 
-            <!-- EMAIL -->
             <div class="space-y-2">
                 <label class="block text-sm font-semibold text-blue-950">
                     E-mail Institucional
@@ -49,15 +46,14 @@
                 @enderror
             </div>
 
-            <!-- PASSWORD -->
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
                     <label class="block text-sm font-semibold text-blue-950">
                         Palavra-passe
                     </label>
-                    <span class="text-xs font-bold text-blue-700">
+                    <a href="#" class="text-xs font-bold text-blue-700 hover:underline">
                         Esqueceu-se?
-                    </span>
+                    </a>
                 </div>
 
                 <div class="relative">
@@ -76,7 +72,6 @@
                                @error('password') border-red-500 @else border-gray-200 @enderror"
                     />
 
-                    <!-- TOGGLE EYE -->
                     <button
                         type="button"
                         onclick="togglePassword('password', this)"
@@ -91,20 +86,6 @@
                 @enderror
             </div>
 
-            <!-- REMEMBER -->
-            <div class="flex items-center">
-                <input
-                    type="checkbox"
-                    name="remember"
-                    id="remember"
-                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                >
-                <label for="remember" class="ml-2 text-sm text-gray-600">
-                    Manter sessão iniciada
-                </label>
-            </div>
-
-            <!-- BUTTON -->
             <button
                 type="submit"
                 class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl
@@ -117,21 +98,51 @@
 
         </form>
 
-        <!-- FOOTER CARD -->
         <div class="mt-8 pt-6 border-t border-gray-100 text-center">
-            <p class="text-xs text-gray-500 uppercase tracking-wider leading-relaxed">
-                Acesso restrito <br>
-                <span class="font-bold text-gray-400 text-[10px]">
-                    Credenciais fornecidas pela Direção Académica
-                </span>
+            <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+                Acesso Seguro • IP Académico
             </p>
         </div>
     </div>
 
-    <p class="text-center mt-8 text-sm text-gray-400">
+    <div class="mt-6 flex flex-col gap-3 items-center">
+        
+        <div class="text-sm font-medium text-gray-600">
+            Ainda não tem conta?
+            <a href="/create_estudante" class="text-blue-700 font-bold hover:underline ml-1">
+                Cadastrar como Estudante
+            </a>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+            <a href="{{ route('home') }}" class="text-xs font-bold text-gray-400 hover:text-blue-700 transition-colors uppercase tracking-tighter flex items-center gap-1">
+                <i class="fas fa-arrow-left text-[10px]"></i>
+                Voltar à Página Inicial
+            </a>
+            <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+        </div>
+        
+    </div>
+
+    <p class="text-center mt-10 text-[10px] text-gray-400 font-medium uppercase tracking-widest">
         &copy; 2026 IP ACADÉMICO. Todos os direitos reservados.
     </p>
 
 </div>
+
+<script>
+    function togglePassword(id, el) {
+        const input = document.getElementById(id);
+        const icon = el.querySelector('i');
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = "password";
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+</script>
 
 @endsection

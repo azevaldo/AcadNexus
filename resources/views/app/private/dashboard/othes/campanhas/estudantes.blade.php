@@ -10,7 +10,11 @@
             <h1 class="text-3xl font-bold text-gray-800">Camapnha :  {{ $campanha->titulo }}</h1>
             <p class="text-sm text-gray-500">Lista de estudante</p>
         </div>
- @hasanyrole('admin|coordenador|secretaria')
+ @hasanyrole('admin|coordenador')
+ <a href="{{ route('campanhas.show', $campanha->id) }}"" 
+               class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-semibold transition duration-200 flex items-center gap-2">
+                <i class="fas fa-arrow-left text-xs"></i> Voltar
+            </a>
        <button
 onclick="openModal('addStudentModal')"
 class="bg-gradient-to-r from-blue-600 to-indigo-600

@@ -84,23 +84,6 @@
                             </div>
                         </td>
 
-                        <td class="px-6 py-5 text-center">
-                            <form action="{{ route('tutores.toggle', $prof->id) }}" method="POST">
-                                @csrf
-                                @if($prof->tutor)
-                                    <button type="submit" class="inline-flex items-center gap-2 bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase border border-emerald-100 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all group/btn">
-                                        <i class="fas fa-check-circle group-hover/btn:hidden"></i>
-                                        <i class="fas fa-times-circle hidden group-hover/btn:inline"></i>
-                                        Tutor Ativo
-                                    </button>
-                                @else
-                                    <button type="submit" class="inline-flex items-center gap-2 bg-slate-50 text-slate-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase border border-slate-100 hover:bg-blue-600 hover:text-white transition-all">
-                                        <i class="fas fa-graduation-cap"></i>
-                                        Tornar Tutor
-                                    </button>
-                                @endif
-                            </form>
-                        </td>
 
                         <td class="px-6 py-5 text-right">
                             <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-0 translate-x-2">

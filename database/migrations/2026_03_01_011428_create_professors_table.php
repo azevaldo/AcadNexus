@@ -14,6 +14,7 @@ return new class extends Migration
        Schema::create('professores', function (Blueprint $table) {
     $table->id();
     $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+    $table->integer('max_orientacoes')->default(3);
     $table->timestamps();
 });
     }

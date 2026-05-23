@@ -16,6 +16,8 @@ return new class extends Migration
     $table->foreignId('user_id')->constrained()->cascadeOnDelete();
     $table->foreignId('curso_id')->constrained()->cascadeOnDelete();
     $table->string('numero_matricula')->unique();
+     $table->string('bi')->unique();
+      $table->integer('ano_frequencia');
     $table->enum('regime',['Regular','Pós Laboral'])->default("Regular");
     $table->timestamps();
 });

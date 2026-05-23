@@ -8,7 +8,7 @@ class Estudante extends Model
 {
     protected $table = 'estudantes';
 
-    protected $fillable = ['user_id','curso_id','numero_matricula','regime'];
+    protected $fillable = ['user_id','curso_id','numero_matricula','regime','bi','ano_frequencia'];
 
     public function user()
     {

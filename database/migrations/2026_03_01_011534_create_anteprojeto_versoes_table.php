@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('anteprojeto_versoes', function (Blueprint $table) {
     $table->id();
-    $table->foreignId('anteprojeto_id')->constrained('anteprojetos')->cascadeOnDelete();
+    $table->foreignId('anteprojeto_id')->constrained('anteprojetos')->onDelete('cascade');
     $table->string('arquivo');
     $table->text('descricao')->nullable(); 
     $table->integer('numero_versao')->default(1);
     $table->enum('status', ['submetido', 'aprovado', 'rejeitado', 'melhorias'])->default('submetido');
+    $table->boolean('lida')->default(false);
     $table->timestamps();
 });
     }

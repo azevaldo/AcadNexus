@@ -10,9 +10,11 @@ class AcompanhamentoTcc extends Model
 
     protected $fillable = [
         'estudante_id','tutor_id','co_tutor_id',
-        'anteprojeto_id','status'
+        'anteprojeto_id','status','mes_referencia'
     ];
-
+protected $casts = [
+    'mes_referencia' => 'date', // ou 'datetime'
+];
     public function estudante()
     {
         return $this->belongsTo(Estudante::class);
@@ -20,12 +22,12 @@ class AcompanhamentoTcc extends Model
 
     public function tutor()
     {
-        return $this->belongsTo(Tutor::class);
+        return $this->belongsTo(Professor::class);
     }
 
     public function coTutor()
     {
-        return $this->belongsTo(Tutor::class, 'co_tutor_id');
+        return $this->belongsTo(Professor::class, 'co_tutor_id');
     }
 
     public function fases()

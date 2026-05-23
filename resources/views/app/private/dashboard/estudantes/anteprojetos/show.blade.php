@@ -17,7 +17,7 @@
     
     <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between bg-white p-6 rounded-3xl border border-slate-100 shadow-sm gap-4">
         <div class="flex items-center gap-4">
-            <a href="{{ url()->previous() }}" class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 transition shadow-sm">
+            <a href="{{ route('estudante.anteprojetos.meuAnteprojeto', $campanha->id) }}" class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 transition shadow-sm">
                 <i class="fas fa-arrow-left"></i>
             </a>
            <div class="flex items-center gap-3">
@@ -48,9 +48,37 @@
     <div class="flex items-center gap-3">
              
 
-                    <a href="{{ route('estudante.anteprojetos.nova_versao', $anteprojeto->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center">
-                        <i class="fas fa-sync-alt mr-2"></i> Enviar Nova Versão
-                    </a>
+
+             @if($anteprojeto->status=='aprovado')
+                    <div class="alert">Aprovado Com Sucesso</div>
+                @else
+                
+                @if($campanha->prazo_melhorias)
+                <div class="alert">BUG</div>
+                    @if($fase2==true)
+                        @if($anteprojeto->status == 'melhorias')
+                            <a href="{{ route('estudante.anteprojetos.nova_versao', $anteprojeto->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center">
+                                <i class="fas fa-sync-alt mr-2"></i> Enviar Nova Versão
+                            </a>
+                        @elseif($anteprojeto->status =='rejeitado' && $totalAnteprojetos==1  && $totalVersoes==1)
+                            <a href="{{ route('estudante.anteprojetos.create', $campanha->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center">
+                                <i class="fas fa-sync-alt mr-2"></i>    Novo Anteprojeto
+                            </a>
+                            @elseif($anteprojeto->status =='rejeitado' && $totalVersoes>1)
+
+                            <div class="alert">Campanha Finalizada, Espere a proxima</div>
+                        
+                        @endif
+                    @else
+                    <div class="alert">Prazo Para Melhorias Esgotado</div>
+                    @endif
+                @endif
+
+            @endif
+
+
+
+                   
              
         </div>
 
@@ -137,7 +165,7 @@
                title="Abrir Documento">
                 <i class="fas fa-external-link-alt text-xs"></i>
             </a>
-
+                @if(!$v->lida)
             {{-- BOTÃO ELIMINAR --}}
             <button 
                 @click="openDeleteModal = true; deleteRoute = '{{ route('estudante.anteprojetos.versao.destroy', $v->id) }}'"
@@ -145,6 +173,7 @@
                 title="Eliminar Versão">
                 <i class="fas fa-trash text-xs"></i>
             </button>
+            @endif
         </div>
     </td>
 </tr>
@@ -154,17 +183,16 @@
                 </div>
             </div>
 
-{{-- Histórico de Avaliações Refatorado --}}
+{{-- Histórico de Avaliações Refatorado com Itens de Melhoria --}}
 <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
     <h2 class="text-sm font-black text-slate-800 uppercase mb-8 tracking-widest flex items-center">
         <i class="fas fa-comment-dots mr-3 text-amber-500"></i> Pareceres Técnicos por Versão
     </h2>
 
     @php
-        // Buscamos as versões que possuem decisão, ordenando pela mais recente
         $versoesComDecisao = $anteprojeto->versoes()
             ->has('decisao')
-            ->with('decisao.coordenador.professor.user')
+            ->with(['decisao.coordenador.professor.user', 'decisao.itensMelhoria'])
             ->orderBy('numero_versao', 'desc')
             ->get();
     @endphp
@@ -174,7 +202,6 @@
             @foreach($versoesComDecisao as $v)
                 @php $decisao = $v->decisao; @endphp
                 <div class="flex gap-4">
-                    {{-- Timeline visual --}}
                     <div class="flex flex-col items-center">
                         <div class="w-4 h-4 rounded-full border-4 border-white shadow-sm {{ $decisao->decisao == 'aprovado' ? 'bg-emerald-500' : ($decisao->decisao == 'melhorias' ? 'bg-amber-500' : 'bg-red-500') }}"></div>
                         <div class="w-px h-full bg-slate-100 mt-2"></div>
@@ -183,10 +210,9 @@
                     <div class="flex-1 pb-4">
                         <div class="bg-slate-50/80 p-6 rounded-2xl border border-slate-100 relative shadow-sm">
                             
-                            {{-- NUMERO DA VERSÃO EM DESTAQUE --}}
                             <div class="absolute -top-3 right-6">
-                                <span class="bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg">
-                                    VERSÃO {{ $v->numero_versao }}
+                                <span class="bg-slate-900 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg uppercase">
+                                    Versão {{ $v->numero_versao }}
                                 </span>
                             </div>
 
@@ -204,21 +230,39 @@
                                     <span class="text-[10px] text-slate-300">{{ $decisao->created_at->format('H:i') }}</span>
                                 </div>
                             </div>
-                            
-                            {{-- Mensagem do Coordenador --}}
-                            <div class="bg-white p-4 rounded-xl border border-slate-100 text-slate-600 text-sm leading-relaxed shadow-inner italic">
+
+                            {{-- MENSAGEM GERAL DO COORDENADOR --}}
+                            <div class="bg-white p-4 rounded-xl border border-slate-100 text-slate-600 text-sm leading-relaxed shadow-inner italic mb-4">
                                 "{{ $decisao->mensagem }}"
                             </div>
-                            
-                            <div class="mt-4 flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-[10px]">
-                                        <i class="fas fa-user-check"></i>
+
+                            {{-- SEÇÃO DE MELHORIAS ESPECÍFICAS --}}
+                            @if($decisao->decisao == 'melhorias' && $decisao->itensMelhoria->count() > 0)
+                                <div class="mt-4">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Pontos que precisam de atenção:</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach($decisao->itensMelhoria as $item)
+                                            <button 
+                                                @click="openModal = true; 
+                                                        modalTitle = 'Detalhes: {{ addslashes($item->titulo) }}'; 
+                                                        modalContent = '{{ addslashes($item->descricao) }}'"
+                                                class="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-100 rounded-lg text-amber-700 hover:bg-amber-100 transition-all text-left">
+                                                <i class="fas fa-info-circle text-[10px]"></i>
+                                                <span class="text-[10px] font-bold uppercase tracking-tight">{{ $item->titulo }}</span>
+                                            </button>
+                                        @endforeach
                                     </div>
-                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
-                                        Prof. {{ $decisao->coordenador->professor->user->name }}
-                                    </span>
+                                    <p class="text-[9px] text-slate-400 mt-2 italic">* Clique nos itens acima para ver a explicação detalhada.</p>
                                 </div>
+                            @endif
+                            
+                            <div class="mt-6 pt-4 border-t border-slate-200/50 flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-[10px]">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+                                    Prof. {{ $decisao->coordenador->professor->user->name }}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -226,12 +270,12 @@
             @endforeach
         </div>
     @else
+        {{-- Estado Vazio (Mesmo do seu código) --}}
         <div class="text-center py-12 bg-slate-50/50 rounded-[2rem] border border-dashed border-slate-200">
             <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <i class="fas fa-hourglass-half text-slate-300 text-xl"></i>
             </div>
             <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Aguardando Avaliação</p>
-            <p class="text-slate-400 text-[10px] mt-1">A sua última submissão ainda não foi revisada pela coordenação.</p>
         </div>
     @endif
 </div>
@@ -256,6 +300,29 @@
                         </div>
                     </div>
 
+                     <div class="flex items-center justify-between group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-blue-400 group-hover:scale-110 transition">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                           <div>
+                                <span class="text-[10px] text-slate-500 font-bold uppercase">Submissão</span>
+                                <p class="font-bold text-slate-100">{{ ($campanha->prazo_submissao)? \Carbon\Carbon::parse($campanha->prazo_submissao)->format('d/m/Y'):'Não definido' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-amber-400 group-hover:scale-110 transition">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                             <div>
+                                <span class="text-[10px] text-slate-500 font-bold uppercase">Melhorias</span>
+                                <p class="font-bold text-slate-100">{{ ($campanha->prazo_melhorias)?\Carbon\Carbon::parse($campanha->prazo_melhorias)->format('d/m/Y') :'Não definido'}}</p>
+                            </div>
+                        </div>
+                    </div>
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-emerald-400">
                             <i class="fas fa-calendar-check text-sm"></i>

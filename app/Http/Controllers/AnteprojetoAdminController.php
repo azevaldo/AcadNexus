@@ -34,20 +34,74 @@ public function historicoAnteprojeto($id)
         'estudante.user',
         'versoes.decisao.coordenador.professor.user' // Carrega a decisão de cada versão
     ])->findOrFail($id);
-
-    return view('app.private.dashboard.othes.anteprojetos.historico', compact('anteprojeto'));
+$itensMelhoria = \App\Models\ItemMelhoria::get();
+if(!$anteprojeto->ultimaVersao->lida){
+    $ultima=$anteprojeto->ultimaVersao;
+    $ultima->lida=true;
+$ultima->save();
+    }
+  
+    return view('app.private.dashboard.othes.anteprojetos.historico', compact('itensMelhoria','anteprojeto'));
 }
     public function show($id)
 {
     // Carrega o anteprojeto com a relação da campanha para o cabeçalho
     $anteprojeto = Anteprojeto::with('campanha')->findOrFail($id);
-
+  
     // Opcional: Validar se o usuário logado tem permissão (ex: se é o dono ou coordenador)
     // if (Auth::user()->estudante->id !== $anteprojeto->estudante_id) { abort(403); }
 
     return view('app.private.dashboard.othes.anteprojetos.show', compact('anteprojeto'));
 }
- public function storeAvaliacao(Request $request, $id)
+
+// Método para salvar a avaliação
+public function storeAvaliacao(Request $request, $id) {
+    $request->validate([
+        'anteprojeto_versao_id' => 'required|exists:anteprojeto_versoes,id',
+        'decisao' => 'required|in:aprovado,melhorias,rejeitado',
+        'mensagem' => 'required|string',
+        'melhorias' => 'nullable|array', // Array de IDs dos itens selecionados
+    ]);
+
+    try {
+        DB::beginTransaction();
+$anteprojeto = Anteprojeto::findOrFail($id);
+$coordenador=$anteprojeto->campanha->curso->departamento->coordenador;
+        // 1. Criar ou atualizar a decisão (assumindo modelo Decisao)
+        $decisao = \App\Models\DecisaoAnteprojeto::updateOrCreate(
+            ['anteprojeto_versao_id' => $request->anteprojeto_versao_id],
+            [
+                'decisao' => $request->decisao,
+                'mensagem' => $request->mensagem,
+                'coordenador_id' => $coordenador->id // Ajuste conforme seu auth
+            ]
+        );
+
+        // 2. Sincronizar os itens de melhoria na tabela pivô
+        // Se a decisão for 'melhorias', anexa os IDs; caso contrário, limpa.
+        if ($request->decisao === 'melhorias' && $request->has('melhorias')) {
+            // Relacionamento Many-to-Many entre Decisao e ItemMelhoria
+            $decisao->itensMelhoria()->sync($request->melhorias);
+        } else {
+            $decisao->itensMelhoria()->detach();
+        }
+
+        // 3. Atualizar status do anteprojeto e da versão
+        $anteprojeto = Anteprojeto::findOrFail($id);
+        $anteprojeto->update(['status' => $request->decisao]);
+        
+        \App\Models\AnteprojetoVersao::where('id', $request->anteprojeto_versao_id)
+            ->update(['status' => $request->decisao]);
+
+        DB::commit();
+        return redirect()->back()->with('success', 'Avaliação registrada com sucesso!');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Erro ao salvar: ' . $e->getMessage());
+    }
+}
+ public function storeAvaliacaoOld(Request $request, $id)
 { 
     try {
     // 1. Validação robusta

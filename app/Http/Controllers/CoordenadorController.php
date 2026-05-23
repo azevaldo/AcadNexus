@@ -44,7 +44,7 @@ class CoordenadorController extends Controller
                 ->exists();
 
             if ($departamentoTem) {
-                return back()->withErrors('Este departamento já possui coordenador ativo.');
+                return back()->with('error','Este departamento já possui coordenador ativo.');
             }
 
             // 🔒 Verifica se o professor já é coordenador
@@ -53,7 +53,7 @@ class CoordenadorController extends Controller
                 ->exists();
 
             if ($professorJa) {
-                return back()->withErrors('Este professor já é coordenador de outro departamento.');
+                return back()->with('error','Este professor já é coordenador de outro departamento.');
             }
 
             $coordenador=Coordenador::create([

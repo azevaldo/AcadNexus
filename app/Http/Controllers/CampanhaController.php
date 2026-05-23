@@ -21,7 +21,7 @@ public function __construct()
         // 2. Index e Show: Acessíveis por todos os cargos mencionados
         $this->middleware('roles:coordenador|professor|secretaria|admin|estudante')
              ->only(['index', 'show', 'indexPorCurso','estudantes']);
-
+    
         // 3. Restante dos métodos: Apenas cargos administrativos
         $this->middleware('roles:coordenador|admin|secretaria')
              ->except(['index', 'show', 'indexPorCurso','estudantes']);
@@ -124,7 +124,7 @@ $q->where('email',$request->email);
 
 if(!$estudante){
 
-return back()->return  ->with('error','Nenhum estudante encontrado com esse email.'
+return back()->with('error','Nenhum estudante encontrado com esse email.'
 );
 
 }
@@ -177,7 +177,20 @@ DB::table('campanha_estudante')->insert([
 return back()->with('success','Estudante adicionado à campanha com sucesso.');
 
 }
+public function updatePrazos(Request $request, Campanha $campanha)
+{
+    $request->validate([
+        'prazo_submissao' => 'required|date',
+        'prazo_melhorias' => 'nullable|date',
+    ]);
 
+    $campanha->update([
+        'prazo_submissao' => $request->prazo_submissao,
+        'prazo_melhorias' => $request->prazo_melhorias,
+    ]);
+
+    return redirect()->back()->with('success', 'Prazos atualizados com sucesso!');
+}
  
     public function store(Request $request)
     {
@@ -187,7 +200,7 @@ return back()->with('success','Estudante adicionado à campanha com sucesso.');
             'titulo' => 'required|string|max:255',
             'descricao' => 'required|string',
             'prazo_submissao' => 'nullable|date',
-            'status' => 'required|in:aberta,encerrada'
+           
         ]);
 
         DB::beginTransaction();
@@ -212,7 +225,7 @@ return back()->with('success','Estudante adicionado à campanha com sucesso.');
                 'titulo' => $request->titulo,
                 'descricao' => $request->descricao,
                 'prazo_submissao' => $request->prazo_submissao,
-                'status' => $request->status
+                'status' => 'aberta'
             ]);
 
             DB::commit();

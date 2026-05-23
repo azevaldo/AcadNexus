@@ -26,11 +26,7 @@ class Anteprojeto extends Model
     }
 // App\Models\Anteprojeto.php
 
-public function decisoes()
-{
-    // Certifique-se de que o nome do Model da tabela de avaliações é este
-    return $this->hasMany(DecisaoAnteprojeto::class, 'anteprojeto_id');
-}
+ 
     // Relação com todas as versões enviadas
     public function versoes()
     {

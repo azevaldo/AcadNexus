@@ -88,7 +88,7 @@
                                         <div class="flex items-center gap-2 mt-0.5">
                                             <span class="text-xs font-semibold text-slate-500">{{ $item->estudante->user->name }}</span>
                                             <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ $item->estudante->curso }}</span>
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ $item->estudante->curso->nome }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -138,12 +138,7 @@
                                         <span class="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">Ver Documento</span>
                                     </a>
 
-                                    {{-- Botão Avaliar --}}
-                                    <a href="{{ route('anteprojetosAdmin.show', $item->id) }}" 
-                                       class="flex items-center gap-2 bg-white border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-sm">
-                                        <i class="fas fa-clipboard-check"></i>
-                                        <span class="hidden md:inline">Avaliar</span>
-                                    </a>
+                                     
 
                                     {{-- Botão Histórico --}}
                                     <a href="{{route('anteprojetosAdmin.historico',$item->id)}}" 

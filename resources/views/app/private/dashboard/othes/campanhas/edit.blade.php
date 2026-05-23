@@ -69,45 +69,7 @@
                     Prazos da Campanha
                 </h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                    <div>
-                        <label class="block text-sm text-gray-600 mb-2">
-                            Prazo Submissão
-                        </label>
-
-                        <input type="date"
-                               name="prazo_submissao"
-                               value="{{ $campanha->prazo_submissao }}"
-                               class="w-full px-4 py-3 rounded-xl border
-                                      focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm text-gray-600 mb-2">
-                            Prazo Melhorias
-                        </label>
-
-                        <input type="date"
-                               name="prazo_melhorias"
-                               value="{{ $campanha->prazo_melhorias }}"
-                               class="w-full px-4 py-3 rounded-xl border
-                                      focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm text-gray-600 mb-2">
-                            Prazo Novo
-                        </label>
-
-                        <input type="date"
-                               name="prazo_novo"
-                               value="{{ $campanha->prazo_novo }}"
-                               class="w-full px-4 py-3 rounded-xl border
-                                      focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                </div>
+                
 
             </div>
 

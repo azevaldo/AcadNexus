@@ -24,4 +24,18 @@ class Curso extends Model
     {
         return $this->hasMany(Campanha::class);
     }
+    // App\Models\Curso.php
+
+public function anteprojetos()
+{
+    // Um curso tem muitos anteprojetos ATRAVÉS das campanhas
+    return $this->hasManyThrough(
+        Anteprojeto::class, 
+        Campanha::class,
+        'curso_id',     // Chave estrangeira em campanhas
+        'campanha_id',  // Chave estrangeira em anteprojetos
+        'id',           // Chave local em cursos
+        'id'            // Chave local em campanhas
+    );
+}
 }

@@ -1,30 +1,29 @@
-@extends('app.private.dashboard.app..templete')
+ @extends('app.private.dashboard.app.templete')
 
 @section('title', 'Editar Cronograma')
 
 @section('content')
-<div class="max-w-5xl mx-auto px-4 py-10 font-sans">
+<div class="max-w-5xl mx-auto px-4 py-10">
     
-    <div class="mb-8 border-b-2 border-gray-100 pb-6 flex justify-between items-end">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 uppercase tracking-tight">Editar Cronograma de TCC</h1>
-            <p class="text-sm text-gray-500 mt-1">Estudante: <span class="font-bold text-blue-600">{{ $acompanhamento->estudante->user->name }}</span></p>
-        </div>
+    <div class="mb-8">
+        <h1 class="text-3xl font-black text-gray-800 uppercase tracking-tight">Editar Cronograma de TCC</h1>
+        <p class="text-gray-500">Estudante: <span class="font-bold text-indigo-600">{{ $acompanhamento->estudante->user->name }}</span></p>
     </div>
 
     <div x-data="{ 
-        fases: {{ $acompanhamento->fases->map(fn($f) => [
-            'id' => $f->id,
-            'fase' => $f->fase,
-            'descricao' => $f->descricao,
-            'inicio' => $f->inicio,
-            'fim' => $f->fim
-        ])->toJson() }},
+        fases: {{ json_encode($fasesEdit) }},
         addFase() {
-            this.fases.push({id: null, fase: '', descricao: '', inicio: '', fim: ''});
+            let lastFim = this.fases.length > 0 ? this.fases[this.fases.length - 1].mes_fim : 0;
+            this.fases.push({
+                id: null, 
+                fase: '', 
+                descricao: '', 
+                mes_inicio: parseInt(lastFim) + 1, 
+                mes_fim: parseInt(lastFim) + 1
+            });
         },
         removeFase(index) {
-            if(confirm('Deseja remover esta fase? Se ela já estiver salva, será excluída permanentemente.')) {
+            if(confirm('Deseja remover esta fase? Se ela já estiver salva no banco, será excluída permanentemente ao salvar.')) {
                 this.fases.splice(index, 1);
             }
         }
@@ -33,57 +32,99 @@
             @csrf
             @method('PUT')
 
-            <div class="bg-white border-2 border-gray-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-                <div class="p-8 border-b-2 border-gray-900 flex justify-between items-center bg-gray-50">
-                    <h3 class="text-sm font-black text-gray-700 uppercase tracking-widest">Ajustar Etapas do Projeto</h3>
+            {{-- Cabeçalho de Informações Reais do Acompanhamento --}}
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="p-4 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-100 col-span-1 md:col-span-2">
+                    <label class="text-[10px] font-black text-indigo-200 uppercase mb-2 block">Mês de Início do TCC (Referência)</label>
+                    <input type="month" name="mes_referencia" required 
+    value="{{ $acompanhamento->mes_referencia ? date('Y-m', strtotime($acompanhamento->mes_referencia)) : '' }}"
+    class="w-full bg-indigo-500 text-white border-none rounded-xl px-4 py-2 focus:ring-2 focus:ring-white outline-none font-bold">
+                </div>
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tutor</p>
+                    <p class="text-xs font-bold text-slate-700">{{ $acompanhamento->tutor->user->name ?? 'Não atribuído' }}</p>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Anteprojeto</p>
+                    <p class="text-xs font-bold text-slate-700 truncate">{{ $acompanhamento->anteprojeto->titulo ?? 'Sem Título' }}</p>
+                </div>
+            </div>
+
+            <div class="bg-white shadow-2xl rounded-[2rem] border border-gray-100 overflow-hidden">
+                <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <h3 class="text-lg font-black text-gray-700 uppercase tracking-tighter">Ajustar Fases do Cronograma</h3>
                     <button type="button" x-on:click="addFase()" 
-                        class="px-4 py-2 bg-gray-900 text-white text-[10px] font-black rounded hover:bg-blue-700 transition uppercase tracking-widest">
-                        + Adicionar Nova Fase
+                        class="px-4 py-2 bg-indigo-600 text-white text-xs font-black rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
+                        <i class="fas fa-plus mr-2"></i> ADICIONAR FASE
                     </button>
                 </div>
 
-                <div class="p-8 space-y-6 bg-white">
+                <div class="p-8 space-y-6">
                     <template x-for="(fase, index) in fases" :key="index">
-                        <div class="p-6 bg-white border-2 border-gray-100 rounded-lg relative group hover:border-gray-900 transition-colors">
+                        <div class="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm relative transition-all hover:border-indigo-200">
                             
+                            {{-- Input oculto do ID da fase para o updateOrCreate do controller funcionar --}}
                             <input type="hidden" :name="'fases['+index+'][id]'" x-model="fase.id">
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="md:col-span-2">
-                                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Nome da Etapa</label>
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                {{-- Nome da Fase --}}
+                                <div class="md:col-span-6">
+                                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Nome da Fase</label>
                                     <input type="text" :name="'fases['+index+'][fase]'" x-model="fase.fase" required
-                                        class="w-full border-2 border-gray-200 rounded px-4 py-3 text-sm font-bold focus:border-gray-900 outline-none transition">
+                                        placeholder="Ex: Entrega do Capítulo 1"
+                                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none">
                                 </div>
-                                <div>
-                                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Data Início</label>
-                                    <input type="date" :name="'fases['+index+'][inicio]'" x-model="fase.inicio" required
-                                        class="w-full border-2 border-gray-200 rounded px-4 py-3 text-sm font-bold focus:border-gray-900 outline-none">
+
+                                {{-- Mês Início --}}
+                                <div class="md:col-span-3">
+                                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Mês Início</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" :name="'fases['+index+'][mes_inicio]'" x-model="fase.mes_inicio" required min="1"
+                                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-center">
+                                        <span class="text-[10px] font-bold text-gray-400 uppercase">Mês</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Data Fim (Prazo)</label>
-                                    <input type="date" :name="'fases['+index+'][fim]'" x-model="fase.fim" required
-                                        class="w-full border-2 border-gray-200 rounded px-4 py-3 text-sm font-bold focus:border-gray-900 outline-none">
+
+                                {{-- Mês Fim --}}
+                                <div class="md:col-span-3">
+                                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Mês Fim</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" :name="'fases['+index+'][mes_fim]'" x-model="fase.mes_fim" required min="1"
+                                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-center">
+                                        <span class="text-[10px] font-bold text-gray-400 uppercase">Mês</span>
+                                    </div>
                                 </div>
-                                <div class="md:col-span-2">
-                                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Instruções</label>
+
+                                {{-- Descrição --}}
+                                <div class="md:col-span-12">
+                                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Descrição dos Objetivos</label>
                                     <textarea :name="'fases['+index+'][descricao]'" x-model="fase.descricao" rows="2"
-                                        class="w-full border-2 border-gray-200 rounded px-4 py-3 text-sm font-medium focus:border-gray-900 outline-none"></textarea>
+                                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none text-sm"></textarea>
                                 </div>
                             </div>
 
-                            <button type="button" x-on:click="removeFase(index)"
-                                class="absolute top-4 right-4 text-gray-300 hover:text-red-600 transition-colors p-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            {{-- Botão Remover Fase --}}
+                            <button type="button" x-on:click="removeFase(index)" x-show="fases.length > 1"
+                                class="absolute -top-3 -right-3 bg-white border border-red-100 text-red-500 hover:bg-red-500 hover:text-white transition-all w-8 h-8 rounded-full shadow-sm">
+                                <i class="fas fa-times text-xs"></i>
                             </button>
                         </div>
                     </template>
                 </div>
 
-                <div class="p-8 bg-gray-50 border-t-2 border-gray-900 flex justify-end gap-4">
-                    <a href="{{ route('tutor.acompanhamento.show', $acompanhamento->id) }}" class="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 transition">Cancelar</a>
-                    <button type="submit" class="px-10 py-4 bg-gray-900 text-white font-black rounded shadow-[4px_4px_0px_0px_rgba(59,130,246,0.5)] hover:bg-blue-600 transition uppercase tracking-widest text-xs">
-                        Atualizar Cronograma
-                    </button>
+                <div class="p-8 bg-gray-50 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-xs text-gray-400 max-w-sm italic">
+                        * O sistema recalculará dinamicamente os prazos com base em qualquer mudança feita no mês de referência.
+                    </p>
+                    <div class="flex gap-3 w-full md:w-auto">
+                        <a href="{{ route('tutor.acompanhamento.show', $acompanhamento->id) }}" 
+                           class="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 transition flex items-center">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="w-full md:w-auto px-10 py-4 bg-gray-900 text-white font-black rounded-2xl hover:bg-indigo-600 transition shadow-xl uppercase tracking-widest text-sm">
+                            Atualizar Cronograma
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>

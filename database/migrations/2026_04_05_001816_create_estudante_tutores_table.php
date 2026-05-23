@@ -12,8 +12,9 @@ return new class extends Migration
         Schema::create('estudante_tutores', function (Blueprint $table) {
             $table->id();
             $table->foreignId('estudante_id')->constrained('estudantes')->cascadeOnDelete();
-            $table->foreignId('tutor_id')->constrained('tutores');
-            $table->foreignId('co_tutor_id')->nullable()->constrained('tutores');
+            $table->foreignId('tutor_id')->constrained('professores');
+            $table->foreignId('co_tutor_id')->nullable()->constrained('professores');
+            $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
     }

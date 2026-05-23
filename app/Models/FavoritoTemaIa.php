@@ -15,8 +15,6 @@ class FavoritoTemaIa extends Model
         return $this->belongsTo(Estudante::class);
     }
 
-    public function sugestao()
-    {
-        return $this->belongsTo(SugestaoTemaIa::class, 'sugestao_id');
-    }
+
+    public function sugestao() { return $this->belongsTo(SugestaoTemaIa::class, 'sugestao_id'); }
 }

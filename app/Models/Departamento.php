@@ -24,4 +24,8 @@ class Departamento extends Model
     {
         return $this->hasOne(Coordenador::class)->where('ativo', true);
     }
+    public function estudantes()
+{
+    return $this->hasManyThrough(Estudante::class, Curso::class);
+}
 }

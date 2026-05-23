@@ -9,10 +9,10 @@
     <!-- Título -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-800">
-            Editar Estudante
+            Orientações e tutoria
         </h1>
         <p class="text-gray-500 text-sm">
-            Atualize as informações do estudante abaixo
+           Informações sobre orientação e tutoria do estudante
         </p>
     </div>
 
@@ -44,7 +44,7 @@
                                 name="name"
                                 value="{{ $estudante->user->name }}"
                                 class="w-full mt-2 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                required>
+                                readonly>
                         </div>
 
                         <div>
@@ -56,97 +56,14 @@
                                 name="email"
                                 value="{{ $estudante->user->email }}"
                                 class="w-full mt-2 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                required>
+                                required readonly>
                         </div>
 
                     </div>
                 </div>
 
-                <!-- Divisor -->
-                <div class="border-t"></div>
+                 </form>
 
-                <!-- Seção Acadêmica -->
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-700 mb-4">
-                        Informações Acadêmicas
-                    </h2>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                        <div>
-                            <label class="text-sm text-gray-600">
-                                Curso
-                            </label>
-
-                            <select name="curso_id"
-                                class="w-full mt-2 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-
-                                @foreach($cursos as $curso)
-
-                                <option value="{{ $curso->id }}"
-                                    @selected($curso->id == $estudante->curso_id)>
-                                    {{ $curso->nome }}
-                                </option>
-
-                                @endforeach
-
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="text-sm text-gray-600">
-                                Número de Matrícula
-                            </label>
-
-                            <input type="text"
-                                name="numero_matricula"
-                                value="{{ $estudante->numero_matricula }}"
-                                class="w-full mt-2 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label class="text-sm text-gray-600">
-                                Regime
-                            </label>
-
-                            <select name="regime"
-                                class="w-full mt-2 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-
-                                <option value="Regular"
-                                @selected($estudante->regime == 'Regular')>
-                                Regular</option>
-
-                                <option value="Pós Laboral"
-                                @selected($estudante->regime == 'Pós Laboral')>
-                                Pós Laboral</option>
-
-                            </select>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Footer -->
-            <div class="flex items-center justify-end gap-4 px-8 py-5 bg-gray-50 border-t">
-
-                <a href="{{ route('estudantes.index') }}"
-                   class="px-5 py-2 rounded-lg border text-gray-600 hover:bg-gray-100 transition">
-                    Cancelar
-                </a>
-
-                <button
-                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow transition">
-                    Atualizar Estudante
-                </button>
-
-            </div>
-
-        </form>
-
-        
-    </div>
 {{-- Seção de Tutoria --}}
 <div class="p-8 border-t bg-gray-50/50 rounded-b-2xl">
     <div class="flex items-center justify-between mb-6">
@@ -168,7 +85,7 @@
         <div class="p-4 bg-white rounded-xl border border-blue-100 shadow-sm flex justify-between items-start">
             <div>
                 <p class="text-[10px] uppercase font-black text-blue-500 tracking-widest mb-1">Tutor Principal</p>
-                <p class="text-sm font-bold text-gray-700">{{ $estudante->tutorRelacao->tutor->professor->user->name }}</p>
+                <p class="text-sm font-bold text-gray-700">{{ $estudante->tutorRelacao->tutor->user->name }}</p>
             </div>
             
             <form action="{{ route('estudantes.tutores.desvincular', $estudante->id) }}" method="POST" onsubmit="return confirm('Remover o tutor principal excluirá toda a orientação. Continuar?')">
@@ -185,7 +102,7 @@
         <div class="p-4 bg-white rounded-xl border border-gray-100 shadow-sm flex justify-between items-start">
             <div>
                 <p class="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-1">Co-Tutor</p>
-                <p class="text-sm font-bold text-gray-700">{{ $estudante->tutorRelacao->coTutor->professor->user->name }}</p>
+                <p class="text-sm font-bold text-gray-700">{{ $estudante->tutorRelacao->coTutor->user->name }}</p>
             </div>
 
             <form action="{{ route('estudantes.tutores.desvincular', $estudante->id) }}" method="POST" onsubmit="return confirm('Remover apenas o co-tutor?')">
@@ -226,7 +143,7 @@
                                 <option value="">Selecione um Tutor</option>
                                 @foreach($tutores as $tutor)
                                     <option value="{{ $tutor->id }}" @selected($estudante->tutorRelacao?->tutor_id == $tutor->id)>
-                                        {{ $tutor->professor->user->name }}
+                                        {{ $tutor->user->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -238,7 +155,7 @@
                                 <option value="">Nenhum</option>
                                 @foreach($tutores as $tutor)
                                     <option value="{{ $tutor->id }}" @selected($estudante->tutorRelacao?->co_tutor_id == $tutor->id)>
-                                        {{ $tutor->professor->user->name }}
+                                        {{ $tutor->user->name }}
                                     </option>
                                 @endforeach
                             </select>

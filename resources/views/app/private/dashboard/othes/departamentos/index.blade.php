@@ -48,24 +48,26 @@
                     </td>
 
                    <td class="px-8 py-5 text-right space-x-4">
-    <a href="{{ route('departamentos.professores', $departamento->id) }}" 
+    <a href="{{ route('departamento.cursos', $departamento->id) }}" 
+   class="text-amber-600 hover:text-amber-800 transition" 
+   title="Cursos">
+   <i class="fas fa-graduation-cap"></i>
+</a>
+                   <a href="{{ route('departamentos.professores', $departamento->id) }}" 
        class="text-amber-600 hover:text-amber-800 transition" 
        title="Listar Professores deste Departamento">
         👥
     </a>
                          @hasanyrole('secretaria|admin')
             <!-- EDIT -->
-                        <button onclick="openModal('editModal{{ $departamento->id }}')"
-                            class="text-blue-600 hover:text-blue-800 transition">
-                            ✏️
-                        </button>
+             <a href="" onclick="openModal('editModal{{ $departamento->id }}')"
+                            class="text-blue-600 hover:text-blue-800 transition" title="Editar">✏️</a>
+   
 
-                       
+                       <a href="" onclick="openModal('deleteModal{{ $departamento->id }}')"
+                            class="text-red-600 hover:text-red-800 transition" title="Eliminar">🗑️</a>
                         <!-- DELETE -->
-                        <button onclick="openModal('deleteModal{{ $departamento->id }}')"
-                            class="text-red-600 hover:text-red-800 transition">
-                            🗑️
-                        </button>
+ 
             
                          @endhasanyrole
                         

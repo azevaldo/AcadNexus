@@ -11,13 +11,7 @@
                 <p class="text-lg text-gray-600 leading-relaxed">
                     O <strong>IP ACADÉMICO</strong> é o ecossistema digital do nosso Instituto Superior, desenhado para organizar, rastrear e elevar a qualidade da investigação científica de estudantes e professores.
                 </p>
-                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                    <a href="/login" class="bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-center hover:bg-blue-800 transition shadow-xl">Área do Utilizador</a>
-                    <div class="flex items-center space-x-3 px-4 py-4 text-gray-500 italic text-sm">
-                        <i class="fas fa-lock"></i>
-                        <span>Acesso exclusivo para membros autorizados</span>
-                    </div>
-                </div>
+                
             </div>
             <div class="relative">
                 <div class="bg-blue-100 rounded-3xl p-4 transform rotate-2">

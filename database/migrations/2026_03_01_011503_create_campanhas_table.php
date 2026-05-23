@@ -19,8 +19,8 @@ return new class extends Migration
     $table->text('descricao');
     $table->date('prazo_submissao')->nullable();
     $table->date('prazo_melhorias')->nullable();
-    $table->date('prazo_novo')->nullable();
-    $table->enum('status', ['aberta','encerrada']);
+     
+    $table->enum('status', ['aberta','encerrada'])->default('aberta');
     $table->timestamps();
         });
     }

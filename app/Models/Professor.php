@@ -8,7 +8,7 @@ class Professor extends Model
 {
     protected $table = 'professores';
 
-    protected $fillable = ['user_id'];
+    protected $fillable = ['user_id','max_orientacoes'];
 
     public function user()
     {
@@ -20,9 +20,20 @@ class Professor extends Model
         return $this->belongsToMany(Departamento::class, 'departamento_professores');
     }
 
-    public function tutor()
+       public function acompanhamentos()
     {
-        return $this->hasOne(Tutor::class);
+        return $this->hasMany(AcompanhamentoTcc::class,'tutor_id');
+    }
+     // 🔥 estudantes como tutor principal
+    public function estudantes()
+    {
+        return $this->hasMany(EstudanteTutor::class, 'tutor_id');
+    }
+
+    // 🔥 estudantes como co-tutor
+    public function coorientados()
+    {
+        return $this->hasMany(EstudanteTutor::class, 'co_tutor_id');
     }
 
     public function areas()
@@ -34,4 +45,9 @@ class Professor extends Model
             'area_cientifica_id'
         );
     }
+    // Dentro do Model Professor.php
+public function orientacoes()
+{
+    return $this->hasMany(EstudanteTutor::class, 'tutor_id');
+}
 }

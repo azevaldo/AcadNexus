@@ -53,9 +53,9 @@
                         </td>
                         <td class="px-8 py-6 text-sm text-gray-500 font-medium">
                             @if($relacao->tutor_id == $tutor->id)
-                                {{ $relacao->coTutor ? $relacao->coTutor->professor->user->name : 'Nenhum co-tutor' }}
+                                {{ $relacao->coTutor ? $relacao->coTutor->user->name : 'Nenhum co-tutor' }}
                             @else
-                                {{ $relacao->tutor->professor->user->name }} (Principal)
+                                {{ $relacao->tutor->user->name }} (Principal)
                             @endif
                         </td>
                         <td class="px-8 py-6 text-right">
@@ -65,10 +65,13 @@
                                 Ver TCC
                             </a>
                             @endif
-                            <a href="{{route('tutor.acompanhamento.create',$relacao->estudante)}}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-indigo-600 transition-colors shadow-md">
+
+                            @if(!$relacao->estudante->acompanhamento)
+                            <a href="{{route('tutor.acompanhamento.confirm',$relacao->estudante)}}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-indigo-600 transition-colors shadow-md">
                                 <i class="fas fa-project-diagram"></i>
                                 Iniciar
                             </a>
+                            @endif
                         </td>
                     </tr>
                     @empty

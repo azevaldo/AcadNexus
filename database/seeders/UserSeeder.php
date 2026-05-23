@@ -19,15 +19,7 @@ class UserSeeder extends Seeder
         ]);
         $admin->assignRole('admin');
 
-        // Secretaria
-        $secretaria = User::create([
-            'name' => 'Secretaria Acadêmica',
-            'email' => 'secretaria@tcc.com',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now(),
-        ]);
-        $secretaria->assignRole('secretaria');
-
+        
         // Coordenador de Exemplo
         $coord = User::create([
             'name' => 'Coordenador DTI',

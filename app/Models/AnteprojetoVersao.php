@@ -12,7 +12,7 @@ class AnteprojetoVersao extends Model
         'anteprojeto_id',
         'arquivo',
         'descricao',
-        'numero_versao',
+        'numero_versao','lida',
         'status' // Status da versão (enviado, aprovado, rejeitado, melhorias)
     ];
 
@@ -37,4 +37,12 @@ class AnteprojetoVersao extends Model
             $versao->numero_versao = $ultima ? $ultima + 1 : 1;
         });
     }
+    // Dentro de app/Models/VersaoAnteprojeto.php
+
+public function itensMelhoria()
+{
+    return $this->belongsToMany(ItemMelhoria::class, 'item_melhoria_versao')
+                ->withPivot('observacao_adicional')
+                ->withTimestamps();
+}
 }

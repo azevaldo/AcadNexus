@@ -16,9 +16,9 @@ class EstudanteTutorController extends Controller
     {
         try{
         $request->validate([
-            'tutor_id' => 'required|exists:tutores,id',
+            'tutor_id' => 'required|exists:professores,id',
            // 'co_tutor_id' => 'nullable|exists:tutores,id|different:tutor_id',
-            'co_tutor_id' => 'nullable|exists:tutores,id',
+            'co_tutor_id' => 'nullable|exists:professores,id',
         ], [
             'different' => 'O co-tutor não pode ser a mesma pessoa que o tutor principal.'
         ]);

@@ -14,28 +14,53 @@
                 <i class="far fa-calendar-alt mr-1"></i> Prazo de Submissão: 
                 <span class="font-semibold text-slate-700">{{ \Carbon\Carbon::parse($campanha->prazo_submissao)->format('d/m/Y') }}</span>
             </p>
+            <p class="text-slate-500 text-sm mt-2">
+                <i class="far fa-calendar-alt mr-1"></i> Prazo de Melhorias: 
+                <span class="font-semibold text-slate-700">{{($campanha->prazo_melhorias)? \Carbon\Carbon::parse($campanha->prazo_melhorias)->format('d/m/Y'):'Não Definido' }}</span>
+            </p>
         </div>
 
         <div class="flex items-center gap-3">
-            @if($anteprojetos->isEmpty())
-                <a href="{{ route('estudante.anteprojetos.create', $campanha->id) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-blue-200 transition-all flex items-center">
-                    <i class="fas fa-plus mr-2"></i> Iniciar Anteprojeto
-                </a>
-            @else
-                @php $ultimo = $anteprojetos->first(); @endphp
-                {{-- Só mostra o botão de nova versão se o coordenador pediu melhorias --}}
-                @if($ultimo->status == 'melhorias')
-                    <a href="{{ route('estudante.anteprojetos.nova_versao', $ultimo->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center">
-                        <i class="fas fa-sync-alt mr-2"></i> Enviar Nova Versão
+            @if($anteprojetos->isEmpty() )
+                @if($fase1==true)    
+                    <a href="{{ route('estudante.anteprojetos.create', $campanha->id) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-blue-200 transition-all flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Iniciar Anteprojeto
                     </a>
                 @else
-                <a href="{{ route('estudante.anteprojetos.create', $campanha->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center">
-                        <i class="fas fa-sync-alt mr-2"></i>    Novo Anteprojeto
-                    </a>
+            
+                    <div class="alert text-danger">Prazo de Submissão Esgotado</div>
+                
+                @endif
+            @else 
+                @php $ultimo = $anteprojetos->first(); @endphp
+                {{-- Só mostra o botão de nova versão se o coordenador pediu melhorias --}}
+               
+               @if($ultimo->status=='aprovado')
+                    <div class="alert">Aprovado Com Sucesso</div>
+                @else
+                @if($campanha->prazo_melhorias)
+                    @if($fase2==true)
+                        @if($ultimo->status == 'melhorias')
+                            <a href="{{ route('estudante.anteprojetos.nova_versao', $ultimo->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center">
+                                <i class="fas fa-sync-alt mr-2"></i> Enviar Nova Versão
+                            </a>
+                        @elseif($ultimo->status =='rejeitado' && $totalAnteprojetos==1  && $totalVersoes==1)
+                            <a href="{{ route('estudante.anteprojetos.create', $campanha->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center">
+                                <i class="fas fa-sync-alt mr-2"></i>    Novo Anteprojeto
+                            </a>
+                        @elseif($ultimo->status =='rejeitado' && $totalAnteprojetos==1  && $totalVersoes>1)
+                        <div class="alert">Espere uma outra campanha...</div>
+                        @elseif($ultimo->status =='rejeitado' && $totalAnteprojetos>1)
+                        <div class="alert">Espere uma outra campanha...</div>
+                        @endif
+                    @else
+                    <div class="alert">Prazo Para Melhorias Esgotado</div>
                     @endif
-
+                @endif
 
             @endif
+
+        @endif
         </div>
     </div>
 
@@ -131,6 +156,10 @@
                         </div>
                         <div class="flex gap-3">
                             <span class="text-blue-400 font-bold">3.</span>
+                            <p class="text-slate-400">Se mudar para "Rejeitado", você deve enviar um outro anteprojeto.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <span class="text-blue-400 font-bold">4.</span>
                             <p class="text-slate-400">Após a aprovação final, você poderá prosseguir para a fase de tutoria.</p>
                         </div>
                     </div>

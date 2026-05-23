@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('avaliacao_fases', function (Blueprint $table) {
              $table->id();
     $table->foreignId('submissao_fase_id')->constrained('submissao_fase')->cascadeOnDelete();
-    $table->foreignId('tutor_id')->constrained('tutores');
+    $table->foreignId('tutor_id')->constrained('professores');
     $table->enum('decisao', ['aprovado','ajustes']);
     $table->text('descricao');
     $table->timestamps();

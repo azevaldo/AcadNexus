@@ -100,6 +100,11 @@
                                    class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                             <button onclick="openModal('prazosModal{{ $campanha->id }}')" 
+        class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" 
+        title="Ajustar Prazos">
+    <i class="fas fa-calendar-alt"></i>
+</button>
                                 <button onclick="openModal('deleteModal{{ $campanha->id }}')" 
                                         class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Eliminar">
                                     <i class="fas fa-trash-alt"></i>
@@ -110,6 +115,49 @@
                         </td>
                     </tr>
 
+<div id="prazosModal{{ $campanha->id }}" class="fixed inset-0 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm z-50 p-4">
+    <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl border border-slate-100">
+        
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-extrabold text-slate-900">Ajustar Prazos</h2>
+            <button onclick="closeModal('prazosModal{{ $campanha->id }}')" class="text-slate-400 hover:text-slate-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <p class="text-slate-500 text-sm mb-6">
+            Campanha: <span class="font-bold text-slate-800">{{ $campanha->titulo }}</span>
+        </p>
+
+        <form method="POST" action="{{ route('campanhas.updatePrazos', $campanha->id) }}" class="space-y-5">
+            @csrf
+            @method('PUT')
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Prazo de Submissão</label>
+                <input type="date" name="prazo_submissao" value="{{ $campanha->prazo_submissao }}" required
+                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Prazo de Melhorias</label>
+                <input type="date" name="prazo_melhorias" value="{{ $campanha->prazo_melhorias }}"
+                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeModal('prazosModal{{ $campanha->id }}')" 
+                        class="flex-1 px-6 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="flex-1 px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all">
+                    Salvar Prazos
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
                     <div id="deleteModal{{ $campanha->id }}" class="fixed inset-0 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm z- p-4">
                         <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl transform transition-all scale-95 border border-slate-100">
                             <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">

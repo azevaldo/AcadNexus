@@ -100,7 +100,7 @@
                                     Clique para carregar ou arraste o ficheiro
                                 </p>
                                 <p class="text-xs text-slate-400 mt-2">
-                                    Formatos aceitos: <span class="text-blue-500 font-medium">PDF, DOCX</span> (Máx: 10MB)
+                                    Formatos aceitos: <span class="text-blue-500 font-medium">PDF, DOCX</span> (Máx: ##indefinido##)
                                 </p>
                             </div>
                         </label>

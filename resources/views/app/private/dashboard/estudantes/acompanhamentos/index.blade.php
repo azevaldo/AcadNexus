@@ -16,7 +16,7 @@
             </div>
 
             <h2 class="text-2xl font-black text-gray-900 uppercase leading-none mb-2">TCC - Orientação</h2>
-            <p class="text-sm text-gray-600 mb-6 font-medium">Tutor: <span class="text-gray-900 font-black underline">{{ $acomp->tutor->professor->user->name }}</span></p>
+            <p class="text-sm text-gray-600 mb-6 font-medium">Tutor: <span class="text-gray-900 font-black underline">{{ $acomp->tutor->user->name }}</span></p>
 
             <div class="border-t-2 border-gray-100 pt-6 flex justify-between items-center">
                 <div class="text-left">

@@ -5,15 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Curso;
 use App\Models\Estudante;
-use App\Models\Tutor;
+use App\Models\Professor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class EstudanteController extends Controller
 {
+public function __construct(){
+     //$this->middleware('roles:coordenador|professor|secretaria|admin|estudante')
+       //      ->only(['index', 'show', 'indexPorCurso','estudantes']);
+}
     public function index()
     {
         try {
@@ -32,6 +37,14 @@ class EstudanteController extends Controller
         }
     }
 
+public function create_estudante()
+    {
+        $cursos = Curso::orderBy('nome')->get();
+
+        return view('app.private.auth.register_estudante',
+            compact('cursos'));
+    }
+
     public function create()
     {
         $cursos = Curso::orderBy('nome')->get();
@@ -43,7 +56,7 @@ class EstudanteController extends Controller
 {
     $estudante = Estudante::with('user')->findOrFail($id);
     $cursos = Curso::all();
-$tutores = Tutor::with('professor.user')->get();
+$tutores = Professor::with('user')->get();
     return view(
         'app.private.dashboard.othes.estudantes.edit',
         compact('estudante','cursos','tutores')
@@ -58,6 +71,8 @@ $tutores = Tutor::with('professor.user')->get();
                 'name' => 'required|string|min:3|max:100',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|min:6|confirmed',
+                'bi' => 'required|',
+                'ano_frequencia' => 'required',
 
                 'curso_id' => 'required|exists:cursos,id',
                 'numero_matricula' => 'required|unique:estudantes,numero_matricula',
@@ -79,20 +94,25 @@ $tutores = Tutor::with('professor.user')->get();
                 'user_id' => $user->id,
                 'curso_id' => $request->curso_id,
                 'numero_matricula' => $request->numero_matricula,
-                'regime' => $request->regime
+                'regime' => $request->regime,
+                'bi' => $request->bi,
+                'ano_frequencia' => $request->ano_frequencia
+
             ]);
 $user-> assignRole('estudante');
+Auth::login($user);
+//dd("o que foi?");
             DB::commit();
-
-            return redirect()->route('estudantes.index')
-                ->with('success','Estudante criado com sucesso');
+return redirect()->route('dashboard')->with('success','Usuario registrado com sucesso!');
+           // return redirect()->route('estudantes.index')
+             //   ->with('success','Estudante criado com sucesso');
 
            } catch(Exception $e){
        
            // dd($e->getMessage());
             DB::rollBack();
             Log::error('Erro ao criar estudante: '.$e->getMessage());
-
+dd($e->getMessage());
             return back()->with('error','Erro ao criar estudante'.$e->getMessage())
                          ->withInput();
         }

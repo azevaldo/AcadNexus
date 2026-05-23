@@ -17,7 +17,7 @@ class EstudanteAcompanhamentoController extends Controller
     {
         $estudante = Auth::user()->estudante;
         $acompanhamentos = AcompanhamentoTcc::where('estudante_id', $estudante->id)
-            ->with(['tutor.professor.user'])
+            ->with(['tutor.user'])
             ->latest()
             ->get();
 
@@ -32,7 +32,7 @@ class EstudanteAcompanhamentoController extends Controller
             abort(403);
         }
 
-        $acompanhamento->load(['fases.submissao.avaliacao', 'tutor.professor.user']);
+        $acompanhamento->load(['fases.submissao.avaliacao', 'tutor.user']);
 
         return view('app.private.dashboard.estudantes.acompanhamentos.show', compact('acompanhamento'));
     }

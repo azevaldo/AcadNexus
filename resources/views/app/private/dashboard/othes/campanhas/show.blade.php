@@ -1,4 +1,4 @@
-@extends('app.private.dashboard.app.templete')
+ @extends('app.private.dashboard.app.templete')
 
 @section('title', 'Detalhes da Campanha')
 
@@ -17,23 +17,27 @@
             </p>
         </div>
 
-        <div class="flex gap-3">
-            @hasanyrole('admin|coordenador|secretaria')
+        <div class="flex flex-wrap gap-3">
+            @hasanyrole('admin|coordenador')
+            <button onclick="openModal('prazosModal{{ $campanha->id }}')"
+                class="bg-indigo-600 text-white hover:bg-indigo-700 px-6 py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-200 border border-transparent">
+                <i class="fas fa-calendar-plus mr-2"></i> Ajustar Prazos
+            </button>
+
             <a href="{{ route('campanhas.edit', $campanha->id) }}"
-               class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-6 py-3 rounded-xl font-bold transition shadow-sm border border-indigo-100">
-                <i class="fas fa-users mr-2"></i> Editar Campanha
+               class="bg-white text-slate-700 hover:bg-slate-50 px-6 py-3 rounded-xl font-bold transition shadow-sm border border-slate-200">
+                <i class="fas fa-edit mr-2 text-amber-500"></i> Editar Campanha
             </a>
             @endhasanyrole
+            
             <a href="{{ route('admin.campanhas.anteprojetos', $campanha->id) }}"
                class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-6 py-3 rounded-xl font-bold transition shadow-sm border border-indigo-100">
-                <i class="fas fa-users mr-2"></i> Ver Anteprojetos
+                <i class="fas fa-file-alt mr-2"></i> Ver Anteprojetos
             </a>
             <a href="{{ route('campanhas.estudantes', $campanha->id) }}"
                class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-6 py-3 rounded-xl font-bold transition shadow-sm border border-indigo-100">
                 <i class="fas fa-users mr-2"></i> Ver Alunos
             </a>
-
-             
         </div>
     </div>
 
@@ -84,42 +88,33 @@
         </div>
 
         <div class="space-y-6">
-            <div class="bg-slate-900 rounded-3xl p-8 text-white shadow-xl shadow-slate-200">
-                <h2 class="text-xs uppercase tracking-[0.2em] font-black text-slate-400 mb-8">Cronograma de Prazos</h2>
+            <div class="bg-slate-900 rounded-3xl p-8 text-white shadow-xl shadow-slate-200 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-8 relative z-10">
+                    <h2 class="text-xs uppercase tracking-[0.2em] font-black text-slate-400">Cronograma</h2>
+                    <i class="fas fa-clock text-slate-700 text-xl"></i>
+                </div>
                 
-                <div class="space-y-8">
+                <div class="space-y-8 relative z-10">
                     <div class="flex items-center justify-between group">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-blue-400 group-hover:scale-110 transition">
+                            <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-blue-400">
                                 <i class="fas fa-upload"></i>
                             </div>
                             <div>
                                 <span class="text-[10px] text-slate-500 font-bold uppercase">Submissão</span>
-                                <p class="font-bold text-slate-100">{{ $campanha->prazo_submissao ?? 'Não definido' }}</p>
+                                <p class="font-bold text-slate-100">{{ ($campanha->prazo_submissao)? \Carbon\Carbon::parse($campanha->prazo_submissao)->format('d/m/Y'):'Não definido' }}</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between group">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-amber-400 group-hover:scale-110 transition">
+                            <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-amber-400">
                                 <i class="fas fa-tools"></i>
                             </div>
                             <div>
                                 <span class="text-[10px] text-slate-500 font-bold uppercase">Melhorias</span>
-                                <p class="font-bold text-slate-100">{{ $campanha->prazo_melhorias ?? 'Não definido' }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between group">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-emerald-400 group-hover:scale-110 transition">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div>
-                                <span class="text-[10px] text-slate-500 font-bold uppercase">Novo Prazo</span>
-                                <p class="font-bold text-emerald-400">{{ $campanha->prazo_novo ?? 'Não definido' }}</p>
+                                <p class="font-bold text-slate-100">{{ ($campanha->prazo_melhorias)?\Carbon\Carbon::parse($campanha->prazo_melhorias)->format('d/m/Y') :'Não definido'}}</p>
                             </div>
                         </div>
                     </div>
@@ -138,8 +133,93 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
+
+@hasanyrole('admin|coordenador|secretaria')
+<div id="prazosModal{{ $campanha->id }}" class="fixed inset-0 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm z- p-4">
+    <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl border border-slate-100 animate-fadeIn">
+        
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-extrabold text-slate-900">Configurar Prazos</h2>
+            <button onclick="closeModal('prazosModal{{ $campanha->id }}')" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+
+        <form method="POST" action="{{ route('campanhas.updatePrazos', $campanha->id) }}" class="space-y-6">
+            @csrf
+            @method('PUT')
+
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-slate-700">Prazo de Submissão</label>
+                <div class="relative">
+                    <i class="fas fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="date" name="prazo_submissao" value="{{ $campanha->prazo_submissao }}" required
+                        class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all font-medium text-slate-700">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-slate-700">Prazo de Melhorias</label>
+                <div class="relative">
+                    <i class="fas fa-tools absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="date" name="prazo_melhorias" value="{{ $campanha->prazo_melhorias }}" 
+                        class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all font-medium text-slate-700">
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeModal('prazosModal{{ $campanha->id }}')" 
+                    class="flex-1 px-6 py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                    class="flex-1 px-6 py-3.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all">
+                    Confirmar Datas
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@endhasanyrole
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-fadeIn { animation: fadeIn 0.25s ease-out forwards; }
+</style>
+
+<script>
+function openModal(id) {
+    const modal = document.getElementById(id);
+    if(modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeModal(id) {
+    const modal = document.getElementById(id);
+    if(modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Fecha o modal ao clicar fora do conteúdo branco
+window.addEventListener('click', function(event) {
+    const modals = document.querySelectorAll('[id^="prazosModal"]');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            closeModal(modal.id);
+        }
+    });
+});
+</script>
 
 @endsection

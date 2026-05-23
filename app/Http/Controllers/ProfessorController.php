@@ -115,6 +115,7 @@ class ProfessorController extends Controller
             $professor->departamentos()->sync($request->departamentos);
             $professor->areas()->sync($request->areas);
 $user-> assignRole('professor');
+ 
             DB::commit();
 
             return redirect()

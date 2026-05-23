@@ -83,9 +83,9 @@
                             <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-blue-400 group-hover:scale-110 transition">
                                 <i class="fas fa-upload"></i>
                             </div>
-                            <div>
+                           <div>
                                 <span class="text-[10px] text-slate-500 font-bold uppercase">Submissão</span>
-                                <p class="font-bold text-slate-100">{{ $campanha->prazo_submissao ?? 'Não definido' }}</p>
+                                <p class="font-bold text-slate-100">{{ ($campanha->prazo_submissao)? \Carbon\Carbon::parse($campanha->prazo_submissao)->format('d/m/Y'):'Não definido' }}</p>
                             </div>
                         </div>
                     </div>
@@ -95,24 +95,14 @@
                             <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-amber-400 group-hover:scale-110 transition">
                                 <i class="fas fa-tools"></i>
                             </div>
-                            <div>
+                             <div>
                                 <span class="text-[10px] text-slate-500 font-bold uppercase">Melhorias</span>
-                                <p class="font-bold text-slate-100">{{ $campanha->prazo_melhorias ?? 'Não definido' }}</p>
+                                <p class="font-bold text-slate-100">{{ ($campanha->prazo_melhorias)?\Carbon\Carbon::parse($campanha->prazo_melhorias)->format('d/m/Y') :'Não definido'}}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between group">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-emerald-400 group-hover:scale-110 transition">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div>
-                                <span class="text-[10px] text-slate-500 font-bold uppercase">Novo Prazo</span>
-                                <p class="font-bold text-emerald-400">{{ $campanha->prazo_novo ?? 'Não definido' }}</p>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
 

@@ -1,4 +1,5 @@
 <?php
+ 
 
 namespace App\Models;
 
@@ -9,7 +10,12 @@ class FaseTcc extends Model
     protected $table = 'fases_tcc';
 
     protected $fillable = [
-        'acompanhamento_id','fase','inicio','fim','descricao','status'
+        'acompanhamento_id', 
+        'fase', 
+        'mes_inicio', // Alterado
+        'mes_fim',    // Alterado
+        'descricao', 
+        'status'
     ];
 
     public function acompanhamento()
@@ -17,24 +23,32 @@ class FaseTcc extends Model
         return $this->belongsTo(AcompanhamentoTcc::class);
     }
 
-   public function submissao()
+    public function submissao()
     {
-        // Se na sua tabela 'submissao_fase' a coluna for 'fase_tcc_id':
-        return $this->hasOne(SubmissaoFase::class, 'fase_tcc_id'); 
-        
-        // Se a coluna na tabela for apenas 'fase_id', use:
-        // return $this->hasOne(SubmissaoFase::class, 'fase_id');
+        return $this->hasOne(SubmissaoFase::class, 'fase_tcc_id');
     }
 
-   public function avaliacao()
-    {
-        return $this->hasOneThrough(
-            AvaliacaoFase::class, 
-            SubmissaoFase::class,
-            'acompanhamento_id', // Chave estrangeira em submissao_fase
-            'submissao_fase_id', // Chave estrangeira em avaliacao_fases
-            'id',                // Chave local em fases_tcc
-            'id'                 // Chave local em submissao_fase
-        );
+    // Acessores para facilitar a exibição das datas reais baseadas no mês de referência
+    // Acessores para facilitar a exibição das datas reais
+public function getDataInicioRealAttribute()
+{
+    // Verifica se o acompanhamento e a data existem antes de calcular
+    if (!$this->acompanhamento || !$this->acompanhamento->mes_referencia) {
+        return null;
     }
+
+    // Se não usou o $casts no outro model, use o Carbon::parse() aqui
+    return \Carbon\Carbon::parse($this->acompanhamento->mes_referencia)
+        ->addMonths($this->mes_inicio - 1);
+}
+
+public function getDataFimRealAttribute()
+{
+    if (!$this->acompanhamento || !$this->acompanhamento->mes_referencia) {
+        return null;
+    }
+
+    return \Carbon\Carbon::parse($this->acompanhamento->mes_referencia)
+        ->addMonths($this->mes_fim - 1);
+}
 }

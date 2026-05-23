@@ -16,26 +16,40 @@ class CursoController extends Controller
     {
       //  $this->middleware('roles:admin')->only(['destroy']);
     }
-    public function estudantePorCursoCreate(Curso $curso){
-            return view('app.private.dashboard.othes.cursos.estudanteCreate', compact( 'curso'));
-    }
-    public function estudantePorCurso(Curso $curso)
+     
+    public function estudantePorCurso(Curso $curso,Request $request)
 {
 
     // Busca estudantes vinculados ao curso específico
-    $estudantes = Estudante::where('curso_id', $curso->id)
-        ->with(['user', 'curso'])
-        ->paginate(10); // Usando paginação conforme sua view sugere
+// Inicia a query com os relacionamentos
+   $query = Estudante::where('curso_id', $curso->id)
+        ->with(['user', 'curso']);
 
+    // Filtro Opcional de Regime
+    if ($request->filled('regime')) {
+        $query->where('regime', $request->regime);
+    }
+
+    // Filtro Opcional de Ano de Frequência
+    if ($request->filled('ano')) {
+        $query->where('ano_frequencia', $request->ano);
+    }
+
+    $estudantes = $query->paginate(10);
+    $departamento = $curso->departamento;
+$regime= $request->regime;
+ 
     return view('app.private.dashboard.othes.cursos.estudantes', [
         'estudantes' => $estudantes,
-        'curso' => $curso // Passamos o curso para o cabeçalho dinâmico
+        'curso' => $curso,
+        'departamento' => $departamento,
+        'regime_selecionado' => $request->regime // Opcional: para mostrar na view qual filtro está ativo
     ]);
 }
     public function index()
     {
         try {
-         //   $this->authorize('admin_or_secret');
+            $this->authorize('admin_or_secret');
 
             $cursos = Curso::with('departamento')->paginate(10);
             $departamentos = Departamento::orderBy('nome')->get();
@@ -47,7 +61,7 @@ class CursoController extends Controller
 
         } catch (Exception $e) {
             Log::error('Erro cursos index: '.$e->getMessage());
-            return redirect()->route('dashboard1')
+            return redirect()->route('dashboard')
                 ->with('error', 'Erro ao carregar cursos'.$e->getMessage());
         }
     }
@@ -77,7 +91,7 @@ class CursoController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->route('cursos.index')
+            return redirect()->back()
                 ->with('success', 'Curso criado com sucesso');
 
         } catch (Exception $e) {

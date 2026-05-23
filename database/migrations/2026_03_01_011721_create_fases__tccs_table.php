@@ -16,8 +16,8 @@ return new class extends Migration
     $table->foreignId('acompanhamento_id')->constrained('acompanhamento_tcc')->cascadeOnDelete();
     $table->string('fase');
     $table->text('descricao')->nullable();
-    $table->date('inicio');
-    $table->date('fim');
+    $table->integer('mes_inicio')->default(1); 
+    $table->integer('mes_fim')->default(1);
     $table->enum('status', ['pendente','submetido','aprovado','ajustes']);
     $table->timestamps();
 });

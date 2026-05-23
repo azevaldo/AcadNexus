@@ -96,22 +96,7 @@
                 </div>
 
 
-                <!-- STATUS -->
-                <div>
-                    <label class="text-sm text-gray-600">
-                        Status
-                    </label>
-
-                    <select name="status"
-                            class="w-full mt-1 px-3 py-2 border rounded-lg
-                                   focus:ring-2 focus:ring-blue-500"
-                            required>
-
-                        <option value="aberta">Aberta</option>
-                        <option value="encerrada">Encerrada</option>
-
-                    </select>
-                </div>
+             
 
             </div>
 

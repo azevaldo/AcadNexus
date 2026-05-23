@@ -14,10 +14,11 @@ return new class extends Migration
     Schema::create('acompanhamento_tcc', function (Blueprint $table) {
         $table->id();
         $table->foreignId('estudante_id')->constrained('estudantes')->cascadeOnDelete();
-        $table->foreignId('tutor_id')->constrained('tutores');
-        $table->foreignId('co_tutor_id')->nullable()->constrained('tutores');
+        $table->foreignId('tutor_id')->constrained('professores');
+        $table->foreignId('co_tutor_id')->nullable()->constrained('professores');
         $table->foreignId('anteprojeto_id')->constrained('anteprojetos')->cascadeOnDelete();
         $table->enum('status', ['ativo','finalizado']); 
+        $table->date('mes_referencia')->nullable();
         $table->timestamps();
 });
     }

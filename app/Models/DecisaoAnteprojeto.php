@@ -14,7 +14,12 @@ class DecisaoAnteprojeto extends Model
         'decisao',
         'mensagem'
     ];
-
+public function itensMelhoria()
+{
+    return $this->belongsToMany(ItemMelhoria::class, 'item_melhoria_decisao', 'decisao_anteprojeto_id', 'item_melhoria_id')
+                ->withPivot('observacao_adicional')
+                ->withTimestamps();
+}
     public function versao()
     {
         return $this->belongsTo(AnteprojetoVersao::class, 'anteprojeto_versao_id');

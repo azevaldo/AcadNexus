@@ -23,12 +23,12 @@ class EstudanteTutor extends Model
     // 🔥 tutor principal
     public function tutor()
     {
-        return $this->belongsTo(Tutor::class, 'tutor_id');
+        return $this->belongsTo(Professor::class, 'tutor_id');
     }
 
     // 🔥 co-tutor
     public function coTutor()
     {
-        return $this->belongsTo(Tutor::class, 'co_tutor_id');
+        return $this->belongsTo(Professor::class, 'co_tutor_id');
     }
 }

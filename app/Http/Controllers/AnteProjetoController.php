@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class AnteprojetoController extends Controller
@@ -16,7 +18,10 @@ class AnteprojetoController extends Controller
     public function destroy_versao($id)
     {
         $versao = AnteprojetoVersao::findOrFail($id);
-        
+        if($versao->lida){
+  
+        return redirect()->back()->with('error','Não é possivel apagar uma versão que ja foi lida');
+    }
         // 1. Validar se pertence ao usuário (Segurança)
         if ($versao->anteprojeto->estudante->user_id !== auth()->id()) {
             return back()->with('error', 'Ação não autorizada.');
@@ -39,16 +44,33 @@ class AnteprojetoController extends Controller
     }
 // Exibe o formulário de NOVA VERSÃO (V2, V3...)
     public function novaVersao($id)
-    {
-        $anteprojeto = Anteprojeto::with('campanha')->findOrFail($id);
-        
-        // Bloqueio de segurança: Só permite se o status for 'pendente_melhorias'
-      /*  if ($anteprojeto->status !== 'melhorias') {
-            return redirect()->back()->with('error', 'Não é possível enviar uma nova versão para este projeto no momento.');
-        }
-Ç*/
-        return view('app.private.dashboard.estudantes.anteprojetos.versao', compact('anteprojeto'));
+{
+    // Carrega o anteprojeto com a campanha relacionada
+    $anteprojeto = Anteprojeto::with('campanha')->findOrFail($id);
+    $campanha = $anteprojeto->campanha;
+    
+    $hoje = Carbon::today();
+
+    // 1. Verificar se a campanha tem uma data de prazo_melhorias definida
+    if (!$campanha->prazo_melhorias) {
+        return redirect()->back()->with('error', 'Esta campanha não possui prazo de melhorias definido.');
     }
+
+    // 2. Verificar se está dentro do prazo (Hoje <= Prazo)
+    $prazoMelhorias = Carbon::parse($campanha->prazo_melhorias);
+    if ($hoje->gt($prazoMelhorias)) {
+        return redirect()->back()->with('error', 'O prazo para envio de melhorias já expirou.');
+    }
+
+    // 3. Verificar se o status do anteprojeto é 'melhorias'
+    // Ajuste o termo 'melhorias' caso o status no banco seja diferente (ex: 'Pendente Correção')
+    if ($anteprojeto->status !== 'melhorias') {
+        return redirect()->back()->with('error', 'Você só pode enviar uma nova versão se o status atual for "melhorias".');
+    }
+
+    // Se passou por todas as validações, abre a view
+    return view('app.private.dashboard.estudantes.anteprojetos.versao', compact('anteprojeto'));
+}
 
     public function updateTitulo(Request $request, $id)
     {
@@ -107,11 +129,39 @@ public function show($id)
 {
     // Carrega o anteprojeto com a relação da campanha para o cabeçalho
     $anteprojeto = Anteprojeto::with('campanha')->findOrFail($id);
+    $campanha=$anteprojeto->campanha;
+$estudante = Auth::user()->estudante;
 
+        // Lista os anteprojetos do estudante nesta campanha, do mais recente para o mais antigo
+        //$anteprojetos = Anteprojeto::where('campanha_id',$campanha->id)->where('estudante_id',$estudante->id)->orderBy('created_at','desc') ->get();
+//dd($anteprojetos->first()->status);
+            $hoje=Carbon::today();
+            $prazoSubmissao=Carbon::parse($campanha->prazo_submissao);
+            $prazoMelhorias=Carbon::parse($campanha->prazo_melhorias);
+        
+            $fase1=false;
+                
+                if($hoje->lt($prazoSubmissao)){
+                    $fase1=true;
+                }
+            $fase2=false;
+                if($campanha->prazo_melhorias!=null ){
+                    if($hoje->lt($prazoMelhorias)){
+                        $fase2=true;
+                    }
+                }else{
+                    $fase2='Não definido';
+                }
+                $totalAnteprojetos = Anteprojeto::where('campanha_id', $campanha->id)
+        ->where('estudante_id', $estudante->id)
+        ->count();
+        $totalVersoes=$anteprojeto->versoes()->count();
+       // dd($totalVersoes);
     // Opcional: Validar se o usuário logado tem permissão (ex: se é o dono ou coordenador)
     // if (Auth::user()->estudante->id !== $anteprojeto->estudante_id) { abort(403); }
 //dd($anteprojeto->decisoes);
-    return view('app.private.dashboard.estudantes.anteprojetos.show', compact('anteprojeto'));
+
+    return view('app.private.dashboard.estudantes.anteprojetos.show', compact('totalVersoes','totalAnteprojetos','fase2','campanha','anteprojeto'));
 }
 public function meuAnteprojeto($campanha_id)
     {
@@ -120,20 +170,92 @@ public function meuAnteprojeto($campanha_id)
         $campanha = Campanha::findOrFail($campanha_id);
 
         // Busca o estudante logado (ajuste conforme a sua relação no Model User)
-        //$estudante = Auth::user()->estudante;
+       $estudante = Auth::user()->estudante;
 
         // Lista os anteprojetos do estudante nesta campanha, do mais recente para o mais antigo
-        $anteprojetos = Anteprojeto::where('campanha_id', $campanha_id)
-          //  ->where('estudante_id', $estudante->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $anteprojetos = Anteprojeto::where('campanha_id',$campanha->id)->where('estudante_id',$estudante->id)->orderBy('created_at','desc') ->get();
+//dd($anteprojetos->first()->status);
+            $hoje=Carbon::today();
+            $prazoSubmissao=Carbon::parse($campanha->prazo_submissao);
+            $prazoMelhorias=Carbon::parse($campanha->prazo_melhorias);
+        
+            $fase1=false;
+                
+                if($hoje->lt($prazoSubmissao)){
+                    $fase1=true;
+                }
+            $fase2=false;
+                if($campanha->prazo_melhorias!=null ){
+                    if($hoje->lt($prazoMelhorias)){
+                        $fase2=true;
+                    }
+                }else{
+                    $fase2='Não definido';
+                }
 
-        return view('app.private.dashboard.estudantes.anteprojetos.index', compact('campanha', 'anteprojetos'));
+                  // 4. CÁLCULO DOS TOTAIS
+    // Quantidade de Anteprojetos criados
+    $totalAnteprojetos = $anteprojetos->count();
+
+    // SOMA TOTAL DE VERSÕES: Percorre todos os anteprojetos e soma a contagem de versões de cada um
+    $totalVersoes = $anteprojetos->sum(function($anteprojeto) {
+        return $anteprojeto->versoes->count();
+    });
+   // dd($fase1,$fase2);
+        return view('app.private.dashboard.estudantes.anteprojetos.index', compact('totalAnteprojetos','totalVersoes','campanha', 'anteprojetos','fase1','fase2'));
     }
     public function create($id)
     {
         $campanha = Campanha::findOrFail($id);
+                
+        // Busca o estudante logado (ajuste conforme a sua relação no Model User)
+       $estudante = Auth::user()->estudante;
 
+        // Pegamos apenas o último anteprojeto para validar o status
+    $ultimoAnteprojeto = Anteprojeto::where('campanha_id', $campanha->id)
+        ->where('estudante_id', $estudante->id)
+        ->latest()
+        ->first();
+
+    $hoje = Carbon::today();
+    $prazoSubmissao = Carbon::parse($campanha->prazo_submissao);
+    $prazoMelhorias = $campanha->prazo_melhorias ? Carbon::parse($campanha->prazo_melhorias) : null;
+
+    // CASO 1: Dentro do prazo de submissão E não tem nenhum anteprojeto
+    $podeSubmeterPrimeiraVez = $hoje->lte($prazoSubmissao) && !$ultimoAnteprojeto;
+
+    // CASO 2: Dentro do prazo de melhorias E o último foi rejeitado
+    // Assumi que o status de rejeição no seu banco seja 'rejeitado'
+    $podeEnviarMelhoria = $prazoMelhorias 
+        && $hoje->lte($prazoMelhorias) 
+        && $ultimoAnteprojeto 
+        && $ultimoAnteprojeto->status === 'rejeitado';
+
+  // Quantidade de Anteprojetos criados
+    $totalAnteprojetos =  Anteprojeto::where('campanha_id', $campanha->id)
+        ->where('estudante_id', $estudante->id)->count();
+ $anteprojetos=Anteprojeto::where('campanha_id', $campanha->id)
+        ->where('estudante_id', $estudante->id)->get();
+    // SOMA TOTAL DE VERSÕES: Percorre todos os anteprojetos e soma a contagem de versões de cada um
+    $totalVersoes = $anteprojetos->sum(function($anteprojeto) {
+        return $anteprojeto->versoes->count();
+    });
+         
+    if($ultimoAnteprojeto){
+
+    
+          if($ultimoAnteprojeto->status =='rejeitado' && $totalAnteprojetos==1  && $totalVersoes>1)
+ 
+                     return redirect()->back()->with('error', 'Espere uma outra campanha..');
+        else if($ultimoAnteprojeto->status =='rejeitado' && $totalAnteprojetos>1)
+        return redirect()->back()->with('error', 'Espere uma outra campanha..');
+                       
+}
+
+    // Validação Final: Se não for nenhum dos dois casos, bloqueia
+    if (!$podeSubmeterPrimeiraVez && !$podeEnviarMelhoria) {
+        return redirect()->back()->with('error', 'Você não tem permissão para realizar uma submissão no momento ou os prazos expiraram.');
+    }
         return view('app.private.dashboard.estudantes.anteprojetos.create', compact('campanha'));
     }
 
@@ -145,7 +267,7 @@ public function meuAnteprojeto($campanha_id)
             $request->validate([
                 'campanha_id' => ['required','exists:campanhas,id'],
                 'descricao' => ['required','string'],
-                'arquivo' => ['required','file','mimes:pdf,doc,docx','max:2048'],
+                'arquivo' => ['required','file','mimes:pdf,doc,docx'],
                 'titulo' => ['required'],
 
             ]);
@@ -202,7 +324,7 @@ public function meuAnteprojeto($campanha_id)
 
             DB::commit();
 
-            return back()->with('success','Anteprojeto enviado com sucesso!');
+            return redirect()->route('estudante.anteprojetos.meuAnteprojeto',$request->campanha_id)->with('success','Anteprojeto enviado com sucesso!');
 
         } catch (Exception $e) {
 

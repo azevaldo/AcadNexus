@@ -15,7 +15,17 @@ class DepartamentoController extends Controller
     {
        $this->middleware('roles:admin,secretaria,')->only(['destroy','store']);
     }
-public function ProfessorPorDepartamento(Departamento $departamento)
+public function cursos(Departamento $departamento)
+{
+   // dd("o q foi?");
+    // Busca professores que possuem o departamento_id na tabela intermediária
+    $cursos = $departamento->cursos;
+    return view('app.private.dashboard.othes.cursos.index', [
+        'cursos' => $cursos,
+        'departamento' => $departamento // Passamos o departamento para o cabeçalho
+    ]);
+}
+    public function ProfessorPorDepartamento(Departamento $departamento)
 {
     // Busca professores que possuem o departamento_id na tabela intermediária
     $professores = Professor::whereHas('departamentos', function($query) use ($departamento) {
