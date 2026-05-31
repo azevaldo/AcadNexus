@@ -7,19 +7,28 @@
 <div class="max-w-4xl mx-auto px-6 py-8">
  
 <!-- HEADER -->
-<div class="mb-6">
-    <h1 class="text-2xl font-semibold text-gray-800">
-        Adicionar Campanha
-    </h1>
-    <p class="text-sm text-gray-500 mt-1">
-        Crie uma nova campanha no sistema
-    </p>
+<div class="flex items-start gap-4 mb-6">
+    {{-- Botão Voltar para as Campanhas do Curso --}}
+    <a href="{{ route('cursos.campanhas', $curso->id) }}" 
+       class="mt-1 flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm shrink-0"
+       title="Voltar para Campanhas do Curso">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div>
+        <h1 class="text-2xl font-semibold text-gray-800 leading-tight">
+            Adicionar Campanha
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">
+            Crie uma nova campanha no sistema
+        </p>
+    </div>
 </div>
 
 
 <form method="POST"
       action="{{ route('campanhas.store') }}"
-      class="bg-white border border-gray-200 rounded-xl">
+      class="bg-white border border-gray-200 rounded-xl"    onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
 
     @csrf
 

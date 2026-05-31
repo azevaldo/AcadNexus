@@ -16,7 +16,7 @@
 
 
         @yield('content')
-       
+               @include('app.private.dashboard.layouts.components')
 
     </div>
 

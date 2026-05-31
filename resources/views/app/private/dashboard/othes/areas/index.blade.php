@@ -55,22 +55,33 @@
                         {{ $area->descricao ?? '-' }}
                     </td>
 
-                    <td class="px-8 py-5 text-right space-x-4">
+                   <td class="px-8 py-5 text-right">
 
-                        <!-- EDIT -->
-                        <button onclick="openModal('editModal{{ $area->id }}')"
-                            class="text-blue-600 hover:text-blue-800">
-                            ✏️
-                        </button>
+    <div class="flex justify-end items-center gap-2">
 
-                        <!-- DELETE -->
-                        <button onclick="openModal('deleteModal{{ $area->id }}')"
-                            class="text-red-600 hover:text-red-800">
-                            🗑️
-                        </button>
+        <!-- EDITAR -->
+        <button onclick="openModal('editModal{{ $area->id }}')"
+            class="w-9 h-9 flex items-center justify-center rounded-lg
+                   text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition"
+            title="Editar Área">
 
-                    </td>
+            <i class="fas fa-pen-to-square"></i>
 
+        </button>
+
+        <!-- ELIMINAR -->
+        <button onclick="openModal('deleteModal{{ $area->id }}')"
+            class="w-9 h-9 flex items-center justify-center rounded-lg
+                   text-slate-500 hover:bg-red-50 hover:text-red-600 transition"
+            title="Eliminar Área">
+
+            <i class="fas fa-trash"></i>
+
+        </button>
+
+    </div>
+
+</td>
                 </tr>
 
                 <!-- MODAL EDIT -->
@@ -86,7 +97,7 @@
                         </h2>
 
                         <form method="POST"
-                              action="{{ route('areasCientificas.update',$area->id) }}">
+                              action="{{ route('areasCientificas.update',$area->id) }}" onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
                             @csrf
                             @method('PUT')
 
@@ -94,13 +105,23 @@
                                 Nome
                             </label>
 
-                            <input type="text"
-                                   name="nome"
-                                   value="{{ $area->nome }}"
-                                   required
-                                   class="w-full mb-4 px-4 py-3 rounded-xl border
-                                          focus:ring-2 focus:ring-blue-500">
+                            
 
+                                          <input type="text"
+       name="nome"
+       value="{{ $area->nome }}"
+       required
+       minlength="3"
+       maxlength="100"
+       pattern="^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$"
+       title="O nome deve possuir entre 3 e 100 caracteres e conter apenas letras, números e espaços."
+       class="w-full px-4 py-3 rounded-xl border
+              focus:ring-2 focus:ring-blue-500
+              focus:outline-none">
+
+<p class="text-xs text-gray-500 mt-2">
+    Mínimo de 3 caracteres. Apenas letras, números e espaços.
+</p>
                             <label class="block text-sm font-semibold mb-2">
                                 Descrição
                             </label>
@@ -147,7 +168,7 @@
                         </p>
 
                         <form method="POST"
-                              action="{{ route('areasCientificas.destroy',$area->id) }}">
+                              action="{{ route('areasCientificas.destroy',$area->id) }}" onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
                             @csrf
                             @method('DELETE')
 
@@ -197,7 +218,7 @@
             </h2>
 
             <form method="POST"
-                  action="{{ route('areasCientificas.store') }}">
+                  action="{{ route('areasCientificas.store') }}"    onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
                 @csrf
 
                 <label class="block text-sm font-semibold mb-2">
@@ -205,10 +226,20 @@
                 </label>
 
                 <input type="text"
-                       name="nome"
-                       required
-                       class="w-full mb-4 px-4 py-3 rounded-xl border
-                              focus:ring-2 focus:ring-blue-500">
+       name="nome"
+      
+       required
+       minlength="3"
+       maxlength="100"
+       pattern="^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$"
+       title="O nome deve possuir entre 3 e 100 caracteres e conter apenas letras, números e espaços."
+       class="w-full px-4 py-3 rounded-xl border
+              focus:ring-2 focus:ring-blue-500
+              focus:outline-none">
+
+<p class="text-xs text-gray-500 mt-2">
+    Mínimo de 3 caracteres. Apenas letras, números e espaços.
+</p>
 
                 <label class="block text-sm font-semibold mb-2">
                     Descrição

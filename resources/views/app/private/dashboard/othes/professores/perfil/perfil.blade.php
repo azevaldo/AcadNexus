@@ -86,12 +86,34 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         {{-- Nome Completo --}}
                         <div>
-                            <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Nome Completo</label>
-                            <input type="text" name="name" value="{{ old('name', $user->name) }}" required
-                                   pattern="^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$"
-                                   class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none font-medium text-sm transition-all">
-                            @error('name') <p class="text-rose-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
-                        </div>
+
+    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">
+        Nome Completo
+    </label>
+
+    
+
+    <input type="text"
+           name="name"
+           value="{{ old('name', $user->name) }}"
+           required
+           pattern="^[A-Za-zÀ-ÖØ-öø-ÿÇç ]{3,100}$"
+           title="Utilize apenas letras e espaços. Mínimo de 3 caracteres."
+           class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3
+                  focus:ring-2 focus:ring-indigo-500 focus:bg-white
+                  outline-none font-medium text-sm transition-all">
+
+    @error('name')
+        <p class="text-rose-600 text-xs mt-2 font-semibold">
+            {{ $message }}
+        </p>
+    @enderror
+    <p class="text-xs text-gray-500 mb-2">
+        Utilize apenas letras e espaços. Mínimo de 3 caracteres.
+        Exemplo: João Manuel Silva
+    </p>
+
+</div>
 
                         {{-- E-mail Institucional --}}
                         <div>

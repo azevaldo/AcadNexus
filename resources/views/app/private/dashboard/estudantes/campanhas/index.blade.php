@@ -53,19 +53,26 @@
                             </div>
                         </td>
 
-                        <td class="px-6 py-5">
+                       <td class="px-6 py-5">
                             @if($campanha->status == 'aberta' || $campanha->status == 'Ativa')
                                 <span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-tight">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
                                     Ativa
                                 </span>
-                            @else
+                            @elseif($campanha->status == 'encerrada')
                                 <span class="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-bold uppercase tracking-tight">
                                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>
                                     Encerrada
                                 </span>
+                                @else
+                                <span class="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold uppercase tracking-tight border border-red-100">
+    <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-2"></span>
+    Cancelada
+</span>
+                                
                             @endif
                         </td>
+
 
                         <td class="px-6 py-5 text-right">
                             <div class="flex justify-end items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">

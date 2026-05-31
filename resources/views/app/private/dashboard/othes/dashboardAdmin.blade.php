@@ -6,7 +6,7 @@
     <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm">
         <div class="flex items-center">
             <div class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter mr-4">
-                System Admin Mode
+               Modo Admin
             </div>
             <h2 class="text-sm font-bold text-gray-500">Painel de Controle Central</h2>
         </div>

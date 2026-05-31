@@ -36,10 +36,33 @@
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-8 py-5 font-medium text-gray-800">{{ $item->titulo }}</td>
                     <td class="px-8 py-5 text-gray-600">{{ Str::limit($item->descricao, 80) }}</td>
-                    <td class="px-8 py-5 text-right space-x-4">
-                        <button onclick="openModal('editModal{{ $item->id }}')" class="text-blue-600 hover:text-blue-800">✏️</button>
-                        <button onclick="openModal('deleteModal{{ $item->id }}')" class="text-red-600 hover:text-red-800">🗑️</button>
-                    </td>
+                    <td class="px-8 py-5 text-right">
+
+    <div class="flex justify-end items-center gap-2">
+
+        <!-- EDITAR -->
+        <button onclick="openModal('editModal{{ $item->id }}')"
+            class="w-9 h-9 flex items-center justify-center rounded-lg
+                   text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition"
+            title="Editar">
+
+            <i class="fas fa-pen-to-square"></i>
+
+        </button>
+
+        <!-- ELIMINAR -->
+        <button onclick="openModal('deleteModal{{ $item->id }}')"
+            class="w-9 h-9 flex items-center justify-center rounded-lg
+                   text-slate-500 hover:bg-red-50 hover:text-red-600 transition"
+            title="Eliminar">
+
+            <i class="fas fa-trash"></i>
+
+        </button>
+
+    </div>
+
+</td>
                 </tr>
 
                 <div id="editModal{{ $item->id }}" class="fixed inset-0 hidden items-center justify-center bg-black/50 backdrop-blur-sm z-50">
@@ -48,8 +71,22 @@
                         <form method="POST" action="{{ route('itensMelhoria.update', $item->id) }}">
                             @csrf @method('PUT')
                             <label class="block text-sm font-semibold mb-2">Título</label>
-                            <input type="text" name="titulo" value="{{ $item->titulo }}" required class="w-full mb-4 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500">
-                            
+                              <input type="text"
+       name="titulo"
+       value="{{ $item->titulo }}"
+       required
+       minlength="3"
+       maxlength="100"
+       pattern="^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$"
+       title="O titulo deve possuir entre 3 e 100 caracteres e conter apenas letras, números e espaços."
+       class="w-full px-4 py-3 rounded-xl border
+              focus:ring-2 focus:ring-blue-500
+              focus:outline-none">
+
+<p class="text-xs text-gray-500 mt-2">
+    Mínimo de 3 caracteres. Apenas letras, números e espaços.
+</p>
+
                             <label class="block text-sm font-semibold mb-2">Descrição</label>
                             <textarea name="descricao" rows="4" required class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500">{{ $item->descricao }}</textarea>
 
@@ -86,11 +123,25 @@
     <div id="createModal" class="fixed inset-0 hidden items-center justify-center bg-black/50 backdrop-blur-sm z-50">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 animate-fadeIn">
             <h2 class="text-xl font-bold mb-6 text-gray-800">Novo Item de Melhoria</h2>
-            <form method="POST" action="{{ route('itensMelhoria.store') }}">
+            <form method="POST" action="{{ route('itensMelhoria.store') }}" onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
                 @csrf
                 <label class="block text-sm font-semibold mb-2">Título</label>
-                <input type="text" name="titulo" required class="w-full mb-4 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500">
+               
+<input type="text"
+       name="titulo"
+      
+       required
+       minlength="3"
+       maxlength="100"
+       pattern="^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$"
+       title="O nome deve possuir entre 3 e 100 caracteres e conter apenas letras, números e espaços."
+       class="w-full px-4 py-3 rounded-xl border
+              focus:ring-2 focus:ring-blue-500
+              focus:outline-none">
 
+<p class="text-xs text-gray-500 mt-2">
+    Mínimo de 3 caracteres. Apenas letras, números e espaços.
+</p>
                 <label class="block text-sm font-semibold mb-2">Descrição</label>
                 <textarea name="descricao" rows="4" required class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500"></textarea>
 

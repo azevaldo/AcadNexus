@@ -70,15 +70,17 @@
                         {{ $coordenador->professor->user->name }}
                     </td>
 
-                    <td class="px-8 py-5 text-right space-x-4">
+                    <td class="px-8 py-5 text-right">
 
-                        <!-- DELETE -->
-                        <button onclick="openModal('deleteModal{{ $coordenador->id }}')"
-                            class="text-red-600 hover:text-red-800 transition">
-                            🗑️
-                        </button>
+    <button onclick="openModal('deleteModal{{ $coordenador->id }}')"
+        class="text-slate-500 hover:text-red-600 transition duration-200"
+        title="Remover Coordenador">
 
-                    </td>
+        <i class="fas fa-trash"></i>
+
+    </button>
+
+</td>
 
                 </tr>
 

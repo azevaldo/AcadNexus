@@ -15,6 +15,7 @@ return new class extends Migration
     $table->id();
     $table->foreignId('fase_tcc_id')->constrained('fases_tcc')->cascadeOnDelete();
     $table->text('descricao_estudante');
+    $table->boolean('visto')->default(false);
     $table->string('arquivo')->nullable();
     $table->timestamps();
 });

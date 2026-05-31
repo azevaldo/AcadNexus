@@ -20,7 +20,7 @@ return new class extends Migration
     $table->date('prazo_submissao')->nullable();
     $table->date('prazo_melhorias')->nullable();
      
-    $table->enum('status', ['aberta','encerrada'])->default('aberta');
+    $table->enum('status', ['aberta','encerrada','cancelada'])->default('aberta');
     $table->timestamps();
         });
     }

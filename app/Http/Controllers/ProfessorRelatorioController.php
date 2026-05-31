@@ -9,6 +9,7 @@ class ProfessorRelatorioController extends Controller
 {
     public function index()
     {
+        try{
         $user = Auth::user();
         $professor = Professor::with([
             'user',
@@ -29,5 +30,8 @@ class ProfessorRelatorioController extends Controller
         ];
  
         return view('app.private.dashboard.othes.professores.relatorios.index', compact('professor', 'stats'));
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 }

@@ -147,7 +147,7 @@
                                         {{ $notification->created_at->diffForHumans() }}
                                     </span>
                                     {{-- O link interceptor para ler e redirecionar automaticamente --}}
-                                    <a href="{{ route('notifications.redirect', ['id' => $notification->id, 'target' => $notification->data['target'] ?? '', 'target_id' => $notification->data['target_id'] ?? '']) }}" class="block group">
+                                    <a href="{{ $notification->data['url'] ?? '#' }}" class="block group">
                                         <h5 class="text-[11px] font-black text-gray-800 uppercase leading-tight group-hover:text-indigo-600 transition-colors">
                                             {{ $notification->data['titulo'] ?? 'Aviso do Sistema' }}
                                         </h5>

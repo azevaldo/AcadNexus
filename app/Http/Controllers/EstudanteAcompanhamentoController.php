@@ -11,10 +11,9 @@ use Illuminate\Support\Facades\Storage;
 
 class EstudanteAcompanhamentoController extends Controller
 {
-    //
-    // Lista os acompanhamentos do estudante logado
     public function index()
     {
+        try{
         $estudante = Auth::user()->estudante;
         $acompanhamentos = AcompanhamentoTcc::where('estudante_id', $estudante->id)
             ->with(['tutor.user'])
@@ -22,93 +21,91 @@ class EstudanteAcompanhamentoController extends Controller
             ->get();
 
         return view('app.private.dashboard.estudantes.acompanhamentos.index', compact('acompanhamentos'));
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 
-    // Visualiza detalhes, fases e permite submissão
     public function show(AcompanhamentoTcc $acompanhamento)
     {
-        // Garante que o estudante só veja o seu próprio acompanhamento
+        try{
         if ($acompanhamento->estudante_id !== Auth::user()->estudante->id) {
             abort(403);
         }
 
-        $acompanhamento->load(['fases.submissao.avaliacao', 'tutor.user']);
+        // 🌟 Carrega as fases trazendo TODAS as submissões ordenadas e suas avaliações
+        $acompanhamento->load(['fases' => function($query) {
+            $query->with(['submissoes.avaliacao', 'submissoes' => function($q) {
+                $q->latest();
+            }]);
+        }, 'tutor.user', 'coTutor.user']);
 
         return view('app.private.dashboard.estudantes.acompanhamentos.show', compact('acompanhamento'));
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 
-    // Processa o upload da submissão
-    public function storeSubmissao2(Request $request, FaseTcc $fase)
-    {
-        $request->validate([
-            'arquivo' => 'required|file|mimes:pdf,docx|max:10240',
-            'comentario_estudante' => 'nullable|string'
-        ]);
-
-        $path = $request->file('arquivo')->store('submissoes_tcc');
-
-        // Atualiza ou cria a submissão para esta fase
-        SubmissaoFase::updateOrCreate(
-            ['fase_tcc_id' => $fase->id],
-            [
-                'arquivo' => $path,
-                'descricao_estudante' => $request->comentario_estudante,
-                
-            ]
-        );
-
-        // Opcional: Mudar status da fase para 'submetido'
-        $fase->update(['status' => 'pendente']);
-
-        return redirect()->back()->with('success', 'Documento enviado com sucesso para análise!');
-    }
+    // 🌟 Processa uma NOVA submissão (Cria histórico, nunca sobrescreve)
     public function storeSubmissao(Request $request, $faseId)
     {
+        try{
         $request->validate([
-            'arquivo' => 'required|file|mimes:pdf,docx|max:10240',
+            'arquivo' => 'required|file|mimes:pdf,docx,zip,rar|max:51200', // Máx 50MB ajustado para segurança padrão
             'descricao_estudante' => 'required|string|max:1000',
         ]);
 
         $fase = FaseTcc::findOrFail($faseId);
 
-        // Se já existir uma submissão, deletamos o arquivo antigo do storage
-        if ($fase->submissao) {
-            Storage::disk('public')->delete($fase->submissao->arquivo);
+        // Garante que o estudante é dono do acompanhamento desta fase
+        if ($fase->acompanhamento->estudante_id !== Auth::user()->estudante->id) {
+            abort(403);
         }
 
-        // Salva o novo arquivo
-        $path = $request->file('arquivo')->store('submissoes', 'public');
+        // Salva o arquivo gerando um hash único no storage privado
+        $path = $request->file('arquivo')->store('submissoes_tcc', 'public');
 
-        // Atualiza ou Cria o registro no banco
-        $fase->submissao()->updateOrCreate(
-            ['fase_tcc_id' => $fase->id],
-            [
-                'arquivo' => $path,
-                'descricao_estudante' => $request->descricao_estudante,
-            ]
-        );
+        // Cria um NOVO registro de submissão vinculando à fase
+        $fase->submissoes()->create([
+            'arquivo' => $path,
+            'descricao_estudante' => $request->descricao_estudante,
+        ]);
 
-        // Volta o status para pendente para o professor reavaliar
+        // Modifica o status da fase para 'pendente' aguardando avaliação do tutor
         $fase->update(['status' => 'pendente']);
 
-        return redirect()->back()->with('success', 'Submissão enviada com sucesso!');
-    }
+        return redirect()->back()->with('success', 'Nova versão da submissão enviada com sucesso!');
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 
     public function destroy($id)
     {
+        try{
         $submissao = SubmissaoFase::findOrFail($id);
-        $fase = $submissao->fase; // Assume que existe o relacionamento belongsTo
+        $fase = $submissao->fase;
 
-        // Deleta o arquivo físico
+        // Proteção: Verifica se a submissão pertence ao estudante logado
+        if ($fase->acompanhamento->estudante_id !== Auth::user()->estudante->id) {
+            abort(403);
+        }
+
+        // Deleta o arquivo físico do disco
         if (Storage::disk('public')->exists($submissao->arquivo)) {
             Storage::disk('public')->delete($submissao->arquivo);
         }
 
         $submissao->delete();
 
-        // Opcional: Voltar status da fase para pendente sem envio
-        $fase->update(['status' => 'pendente']);
+        // Se após apagar não restarem mais submissões, podemos resetar o status da fase
+        if ($fase->submissoes()->count() == 0) {
+            $fase->update(['status' => 'em_aberto']); // ou o seu status padrão inicial
+        }
 
-        return redirect()->back()->with('success', 'Submissão removida.');
+        return redirect()->back()->with('success', 'Submissão removida do histórico com sucesso.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
     }
 }

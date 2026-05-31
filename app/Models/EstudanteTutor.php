@@ -11,7 +11,8 @@ class EstudanteTutor extends Model
     protected $fillable = [
         'estudante_id',
         'tutor_id',
-        'co_tutor_id'
+        'co_tutor_id',
+        'ativo'
     ];
 
     // 🔥 estudante

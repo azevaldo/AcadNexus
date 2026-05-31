@@ -15,6 +15,7 @@ class AdminRelatorioController extends Controller
 {
     public function index()
     {
+        try{
         // 1. Estatísticas Globais (Big Numbers)
         $stats = [
             'total_usuarios'   => User::count(),
@@ -53,5 +54,8 @@ class AdminRelatorioController extends Controller
             'ultimos_anteprojetos', 
             'top_orientadores'
         ));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
     }
 }

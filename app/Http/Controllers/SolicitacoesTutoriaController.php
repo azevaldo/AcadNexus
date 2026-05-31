@@ -19,6 +19,7 @@ class SolicitacoesTutoriaController extends Controller
     // Lista o histórico de solicitações do aluno
     public function indexEstudante()
     {
+        try{
         $estudante = auth()->user()->estudante;
         $solicitacoes = SolicitacaoTutoria::where('estudante_id', $estudante->id)
             ->with('professor.user')
@@ -26,23 +27,50 @@ class SolicitacoesTutoriaController extends Controller
             ->paginate(10);
 
         return view('app.private.dashboard.estudantes.solicitacoes.historico', compact('solicitacoes'));
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 
     // Tela para escolher um professor e solicitar tutoria
-    public function create()
-    {
-        // Busca professores que estão na tabela de 'tutores'
-        // Carrega a contagem de estudantes para mostrar disponibilidade
-        $tutores = Tutor::with(['professor.user'])
-            ->withCount('estudantes') 
-            ->get();
+public function create()
+{
+    try{
+    // 1. Obtém o usuário logado e seus dados de estudante
+    $user = auth()->user();
+    
+    // Carrega o estudante com o curso para saber qual é o departamento
+    $estudante = \App\Models\Estudante::with('curso')->where('user_id', $user->id)->firstOrFail();
 
-        return view('app.private.dashboard.estudantes.solicitacoes.create', compact('tutores'));
+    // Captura o ID do departamento do curso do estudante
+    // (Ajuste o nome do campo 'departamento_id' se na sua tabela de cursos for diferente)
+    $departamentoId = $estudante->curso->departamento_id;
+
+    // 2. Busca apenas os professores do MESMO departamento
+   // 2. Busca apenas os professores do MESMO departamento
+$tutores = Professor::with(['user'])
+    // Filtra os professores que pertencem ao departamento na tabela dinâmica
+    ->whereHas('departamentos', function ($query) use ($departamentoId) {
+        $query->where('departamentos.id', $departamentoId);
+    }) 
+    // Conta as orientações ativas baseadas no relacionamento correto do seu Model
+    ->withCount(['estudantes as orientacoes_ativas_count' => function ($query) {
+        // Filtra as orientações que estão atualmente ativas na tabela estudante_tutores
+        $query->where('ativo', true);
+    }])
+    ->get();
+
+    // Retorna a view brutalista com a lista de professores devidamente filtrada
+    return view('app.private.dashboard.estudantes.solicitacoes.create', compact('tutores'));
+} catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
     }
 
     // Processa o envio da solicitação
     public function store(Request $request, $professor_id)
     {
+        try{
         $estudante = auth()->user()->estudante;
 
         // 1. Validar se já possui tutor principal
@@ -73,11 +101,7 @@ class SolicitacoesTutoriaController extends Controller
     }
         }
 
-        // 2. Verificar se o professor é um tutor
-        $tutor = Tutor::where('professor_id', $professor_id)->first();
-        if (!$tutor) {
-            return back()->with('error', 'Este professor não está habilitado como tutor.');
-        }
+
 
         // 3. Evitar duplicidade de pedido pendente
         $pendente = SolicitacaoTutoria::where('estudante_id', $estudante->id)
@@ -99,6 +123,9 @@ class SolicitacoesTutoriaController extends Controller
 
         return redirect()->route('solicitacoes.estudante.index')
             ->with('success', 'Solicitação enviada com sucesso!');
+            } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -128,7 +155,7 @@ class SolicitacoesTutoriaController extends Controller
             $solicitacao->update(['status' => $request->status]);
 
             if ($request->status === 'aceite') {
-                $tutor = Tutor::where('professor_id', $solicitacao->professor_id)->firstOrFail();
+                $tutor = Professor::where('id', $solicitacao->professor_id)->firstOrFail();
 
                 // Vincula automaticamente na tabela de relação
                 if ($solicitacao->tipo === 'tutor') {

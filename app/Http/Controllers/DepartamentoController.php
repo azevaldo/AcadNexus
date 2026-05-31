@@ -12,30 +12,38 @@ use Illuminate\Support\Facades\Log;
 class DepartamentoController extends Controller
 {
     public function __construct()
-    {
+    { 
        $this->middleware('roles:admin,secretaria,')->only(['destroy','store']);
     }
 public function cursos(Departamento $departamento)
 {
+    try{
    // dd("o q foi?");
     // Busca professores que possuem o departamento_id na tabela intermediária
-    $cursos = $departamento->cursos;
+    $cursos = $departamento->cursos()->paginate(10);
     return view('app.private.dashboard.othes.cursos.index', [
         'cursos' => $cursos,
         'departamento' => $departamento // Passamos o departamento para o cabeçalho
     ]);
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
 }
     public function ProfessorPorDepartamento(Departamento $departamento)
 {
+    try{
     // Busca professores que possuem o departamento_id na tabela intermediária
     $professores = Professor::whereHas('departamentos', function($query) use ($departamento) {
         $query->where('departamento_id', $departamento->id);
-    })->with(['user', 'areas', 'departamentos'])->get();
+    })->with(['user', 'areas', 'departamentos'])->paginate(10);
 
     return view('app.private.dashboard.othes.departamentos.professores', [
         'professores' => $professores,
         'departamento' => $departamento // Passamos o departamento para o cabeçalho
     ]);
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
 }
     public function index()
     {
@@ -61,7 +69,7 @@ public function cursos(Departamento $departamento)
                 'nome' => [
                     'required',
                     'string',
-                    'min:3',
+                    'min:5',
                     'max:100',
                     'regex:/^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$/u',
                     'unique:departamentos,nome'
@@ -93,7 +101,7 @@ public function cursos(Departamento $departamento)
                 'nome' => [
                     'required',
                     'string',
-                    'min:3',
+                    'min:5',
                     'max:100',
                     'regex:/^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$/u',
                     "unique:departamentos,nome,$id"

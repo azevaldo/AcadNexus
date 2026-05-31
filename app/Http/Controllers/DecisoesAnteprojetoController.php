@@ -34,6 +34,7 @@ class DecisoesAnteprojetoController extends Controller
 
 public function storeDecisao(Request $request, $id)
 {
+    try{
     $request->validate([
         'decisao' => 'required|in:aprovado,rejeitado,melhorias',
         'mensagem' => 'required|string|min:10',
@@ -57,6 +58,9 @@ public function storeDecisao(Request $request, $id)
     });
 
     return back()->with('success', 'Avaliação registada com sucesso!');
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
 }
 
     /**

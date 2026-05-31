@@ -55,5 +55,10 @@
             </tbody>
         </table>
     </div>
+     @if($solicitacoes->hasPages())
+        <div class="px-6 py-5 bg-slate-50/50 border-t border-slate-100">
+            {{ $solicitacoes->links() }}
+        </div>
+        @endif
 </div>
 @endsection

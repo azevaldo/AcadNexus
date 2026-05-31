@@ -1,5 +1,4 @@
 <?php
- 
 
 namespace App\Models;
 
@@ -10,12 +9,7 @@ class FaseTcc extends Model
     protected $table = 'fases_tcc';
 
     protected $fillable = [
-        'acompanhamento_id', 
-        'fase', 
-        'mes_inicio', // Alterado
-        'mes_fim',    // Alterado
-        'descricao', 
-        'status'
+        'acompanhamento_id', 'fase', 'mes_inicio', 'mes_fim', 'descricao', 'status'
     ];
 
     public function acompanhamento()
@@ -23,32 +17,27 @@ class FaseTcc extends Model
         return $this->belongsTo(AcompanhamentoTcc::class);
     }
 
-    public function submissao()
+    // 🌟 ALTERADO: Uma fase agora possui VÁRIAS submissões (Histórico)
+    public function submissoes()
     {
-        return $this->hasOne(SubmissaoFase::class, 'fase_tcc_id');
+        return $this->hasMany(SubmissaoFase::class, 'fase_tcc_id')->latest();
     }
 
-    // Acessores para facilitar a exibição das datas reais baseadas no mês de referência
-    // Acessores para facilitar a exibição das datas reais
-public function getDataInicioRealAttribute()
-{
-    // Verifica se o acompanhamento e a data existem antes de calcular
-    if (!$this->acompanhamento || !$this->acompanhamento->mes_referencia) {
-        return null;
+    // 💡 Auxiliar para obter rapidamente a última tentativa de envio
+    public function ultimaSubmissao()
+    {
+        return $this->hasOne(SubmissaoFase::class, 'fase_tcc_id')->latestOfMany();
     }
 
-    // Se não usou o $casts no outro model, use o Carbon::parse() aqui
-    return \Carbon\Carbon::parse($this->acompanhamento->mes_referencia)
-        ->addMonths($this->mes_inicio - 1);
-}
-
-public function getDataFimRealAttribute()
-{
-    if (!$this->acompanhamento || !$this->acompanhamento->mes_referencia) {
-        return null;
+    public function getDataInicioRealAttribute()
+    {
+        if (!$this->acompanhamento || !$this->acompanhamento->mes_referencia) return null;
+        return \Carbon\Carbon::parse($this->acompanhamento->mes_referencia)->addMonths($this->mes_inicio - 1);
     }
 
-    return \Carbon\Carbon::parse($this->acompanhamento->mes_referencia)
-        ->addMonths($this->mes_fim - 1);
-}
+    public function getDataFimRealAttribute()
+    {
+        if (!$this->acompanhamento || !$this->acompanhamento->mes_referencia) return null;
+        return \Carbon\Carbon::parse($this->acompanhamento->mes_referencia)->addMonths($this->mes_fim - 1);
+    }
 }

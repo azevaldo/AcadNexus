@@ -16,11 +16,12 @@ use Exception;
 class EstudanteController extends Controller
 {
 public function __construct(){
-     //$this->middleware('roles:coordenador|professor|secretaria|admin|estudante')
-       //      ->only(['index', 'show', 'indexPorCurso','estudantes']);
+     $this->middleware('roles:coordenador|admin')
+            ->only(['edit', /*'show'*/ 'indexPorCurso','estudantes']);
 }
-    public function index()
+   public function index()
     {
+        return redirect()->route('dashboard')->with('error','Essa pagina deixou de existir!');
         try {
 
             $estudantes = Estudante::with(['user','curso'])
@@ -35,50 +36,121 @@ public function __construct(){
             Log::error('Erro ao listar estudantes: '.$e->getMessage());
             return back()->with('error','Erro ao carregar estudantes'.$e->getMessage());
         }
-    }
+    } 
+public function show($id)
+    {
+        try{
+        // Carrega o estudante com o usuário, curso e os orientadores ativos
+        $estudante = Estudante::with([
+            'user', 
+            'curso', 
+            'tutorRelacao.tutor.user', 
+            'tutorRelacao.coTutor.user'
+        ])->findOrFail($id);
 
+        return view('app.private.dashboard.othes.estudantes.show', compact('estudante'));
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 public function create_estudante()
     {
+        try{
         $cursos = Curso::orderBy('nome')->get();
 
         return view('app.private.auth.register_estudante',
             compact('cursos'));
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+            }
 
     public function create()
     {
+        try{
         $cursos = Curso::orderBy('nome')->get();
 
         return view('app.private.dashboard.othes.estudantes.create',
             compact('cursos'));
-    }
-    public function edit($id)
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+            }
+ public function edit($id)
 {
-    $estudante = Estudante::with('user')->findOrFail($id);
+    try{
+    // 1. Carrega o estudante com o usuário e o curso atual para descobrir o departamento
+    $estudante = Estudante::with(['user', 'curso'])->findOrFail($id);
+    
+    // Busca todos os cursos para popular o select de troca de curso
     $cursos = Curso::all();
-$tutores = Professor::with('user')->get();
+
+    // 2. Captura o departamento do curso atual do estudante sendo editado
+    $departamentoId = $estudante->curso?->departamento_id;
+
+    // 3. Busca os professores usando a relação correta N:N (belongsToMany)
+    $tutores = \App\Models\Professor::with(['user'])
+        ->when($departamentoId, function ($query) use ($departamentoId) {
+            // Filtra os professores que pertencem ao departamento do curso do estudante
+            // varrendo a tabela pivô 'departamento_professores' via relacionamento
+            return $query->whereHas('departamentos', function ($subQuery) use ($departamentoId) {
+                $subQuery->where('departamentos.id', $departamentoId);
+            });
+        })
+        ->withCount(['estudantes as orientacoes_ativas_count' => function ($query) {
+            // Conta as orientações que estão atualmente ativas na tabela pivô de tutoria
+            $query->where('ativo', true);
+        }])
+        ->get();
+
     return view(
         'app.private.dashboard.othes.estudantes.edit',
-        compact('estudante','cursos','tutores')
+        compact('estudante', 'cursos', 'tutores')
     );
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
 }
 
     public function store(Request $request)
     {
         try {
 
-            $request->validate([
-                'name' => 'required|string|min:3|max:100',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|min:6|confirmed',
-                'bi' => 'required|',
-                'ano_frequencia' => 'required',
-
-                'curso_id' => 'required|exists:cursos,id',
-                'numero_matricula' => 'required|unique:estudantes,numero_matricula',
-                'regime' => 'required|in:Regular,Pós Laboral'
-            ]);
-
+   $request->validate([
+    // Correção aqui: [A-Za-z...] em vez de A-Za-Z
+    'name' => [
+        'required', 
+        'string', 
+        'min:3', 
+        'max:100', 
+        'regex:/^[A-Za-zāáâãéêíóôõúçÁÉÍÓÚÇ\s]+$/u'
+    ],
+    
+    'email' => 'required|email|unique:users,email',
+    
+    'password' => 'required|min:6|confirmed',
+    
+    'bi' => [
+        'required',
+        'string',
+        'size:14',
+        'regex:/^\d{9}[A-Z]{2}\d{3}$/i',
+        'unique:estudantes,bi'
+    ],
+    
+    'ano_frequencia' => 'required|in:4,5',
+    
+    'curso_id' => 'required|exists:cursos,id',
+    
+    'numero_matricula' => 'required|unique:estudantes,numero_matricula',
+    
+    'regime' => 'required|in:Regular,Pós Laboral'
+], [
+    'name.regex' => 'O campo nome deve conter apenas letras e espaços.',
+    'bi.regex' => 'O formato do BI é inválido. Deve conter 9 números, seguidos de 2 letras e 3 números (Ex: 000000000LA000).',
+    'bi.size' => 'O BI deve ter exatamente 14 caracteres.',
+    'ano_frequencia.in' => 'O ano de frequência deve ser obrigatoriamente o 4º ou 5º ano.'
+]);
             DB::beginTransaction();
 
             // 🔹 1️⃣ Criar usuário
@@ -112,7 +184,7 @@ return redirect()->route('dashboard')->with('success','Usuario registrado com su
            // dd($e->getMessage());
             DB::rollBack();
             Log::error('Erro ao criar estudante: '.$e->getMessage());
-dd($e->getMessage());
+//dd($e->getMessage());
             return back()->with('error','Erro ao criar estudante'.$e->getMessage())
                          ->withInput();
         }
@@ -122,12 +194,51 @@ dd($e->getMessage());
 {
     try{
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'curso_id' => 'required',
-            'numero_matricula' => 'required',
-        ]);
+       $request->validate([
+    // Nome válido (apenas letras e espaços)
+     'name' => [
+    'required',
+    'string',
+    'min:3',
+    'max:100',
+    'regex:/^[\p{L}\s]+$/u'
+],
+    
+    // Email único, mas ignorando o ID do próprio usuário que está sendo editado
+    'email' => [
+        'required',
+        'email',
+        'unique:users,email,' . $estudante->user_id
+    ],
+    
+    // BI validado (9 números + 2 letras + 3 números) ignorando o próprio registro
+    'bi' => [
+        'required',
+        'string',
+        'size:14',
+        'regex:/^\d{9}[A-Z]{2}\d{3}$/i',
+        'unique:estudantes,bi,' . $estudante->id
+    ],
+    
+    // Ano de frequência restrito a 4 ou 5
+    'ano_frequencia' => 'required|in:4,5',
+    
+    'curso_id' => 'required|exists:cursos,id',
+    
+    // Matrícula única, ignorando a matrícula atual deste estudante
+    'numero_matricula' => [
+        'required',
+        'unique:estudantes,numero_matricula,' . $estudante->id
+    ],
+    
+    'regime' => 'required|in:Regular,Pós Laboral'
+], [
+    // Mensagens de erro personalizadas amigáveis
+    'name.regex' => 'O campo nome deve conter apenas letras e espaços.',
+    'bi.regex' => 'O formato do BI é inválido. Deve conter 9 números, seguidos de 2 letras e 3 números (Ex: 000000000LA000).',
+    'bi.size' => 'O BI deve ter exatamente 14 caracteres.',
+    'ano_frequencia.in' => 'O ano de frequência deve ser obrigatoriamente o 4º ou 5º ano.'
+]);
 
         DB::beginTransaction();
 
@@ -157,6 +268,37 @@ dd($e->getMessage());
         return back()->with('error',$e->getMessage());
     }
 }
+public function toggleAcesso($id)
+{
+    try {
+        DB::beginTransaction();
+
+        $estudante = Estudante::findOrFail($id);
+        $user= $estudante->user;
+        // Inverte o estado atual do acesso
+        $novoEstado = !$user->acesso;
+        $user->acesso = $novoEstado;
+        $user->save(); // Salva o estado no estudante
+
+        // Atualiza a flag correspondente no User caso necessário
+      //  $user = $estudante->user;
+        // Se no seu sistema o bloqueio de login também depende de uma coluna no User, descomente abaixo:
+        // $user->active = $novoEstado; 
+        $user->save();
+
+        DB::commit();
+
+        $mensagem = $novoEstado ? 'Acesso concedido com sucesso.' : 'Acesso retirado com sucesso.';
+        return back()->with('success', $mensagem);
+
+    } catch (Exception $e) {
+        DB::rollBack();
+        Log::error('Erro ao alterar acesso do estudante: ' . $e->getMessage());
+
+        return back()->with('error', 'Erro ao alterar acesso do estudante: ' . $e->getMessage());
+    }
+}
+ 
     public function destroy($id)
     {
         try {
@@ -166,11 +308,14 @@ dd($e->getMessage());
             $estudante = Estudante::findOrFail($id);
 
             // Ao apagar estudante, user será apagado por cascade
-            $estudante->delete();
+           
+            $user=$estudante ->user;
+            $user->acesso=false;
+            $user->save();
 
             DB::commit();
 
-            return back()->with('success','Estudante eliminado com sucesso');
+            return back()->with('success','Acesso retirado  com sucesso');
 
         } catch (Exception $e) {
 
@@ -180,4 +325,5 @@ dd($e->getMessage());
             return back()->with('error','Erro ao eliminar estudante'.$e->getMessage());
         }
     }
+         
 }

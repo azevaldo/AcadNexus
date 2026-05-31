@@ -2,149 +2,417 @@
 
 @section('content')
 
-<div class="max-w-4xl mx-auto px-6 py-12 font-sans">
+<div class="max-w-5xl mx-auto px-6 py-12 font-sans">
 
-    <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-gray-800 tracking-tight">
+    <!-- HEADER -->
+    <div class="mb-10 text-center">
+
+        <div class="inline-flex items-center justify-center
+                    w-16 h-16 rounded-2xl bg-blue-100 mb-4">
+
+            <span class="text-3xl">🎓</span>
+
+        </div>
+
+        <h1 class="text-4xl font-bold text-gray-800 tracking-tight">
             Solicitar Habilitação de Estudante
         </h1>
-        <p class="text-gray-500 mt-2 text-base">
-            Preencha seus dados para validar sua matrícula e iniciar seu processo de anteprojeto.
+
+        <p class="text-gray-500 mt-3 text-base max-w-2xl mx-auto">
+            Preencha cuidadosamente os seus dados académicos para validar
+            sua matrícula e obter acesso ao sistema de anteprojetos.
         </p>
+
     </div>
 
+
+    <!-- FORM -->
     <form method="POST"
           action="{{ route('estudantes.store') }}"
-          class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+          class="bg-white rounded-3xl border border-gray-200
+                 shadow-xl overflow-hidden" onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
 
         @csrf
 
-        <div class="p-8 md:p-10 space-y-10">
+        <div class="p-8 md:p-10 space-y-12">
 
+            <!-- DADOS DE ACESSO -->
             <section>
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
+
+                <div class="flex items-center gap-4 mb-8">
+
+                    <div class="w-12 h-12 rounded-2xl bg-blue-100
+                                flex items-center justify-center
+                                text-blue-600 font-bold text-lg">
+
                         1
+
                     </div>
-                    <h2 class="text-lg font-semibold text-gray-800">Informações de Acesso</h2>
+
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">
+                            Informações de Acesso
+                        </h2>
+
+                        <p class="text-sm text-gray-500">
+                            Dados utilizados para entrar no sistema
+                        </p>
+                    </div>
+
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium text-gray-700 ml-1">Nome Completo</label>
-                        <input type="text" name="name"
-                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                               placeholder="Seu nome acadêmico" required>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
+
+                    <!-- NOME -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Nome Completo
+                        </label>
+
+                        <input type="text"
+                               name="name"
+                               value="{{ old('name') }}"
+                               minlength="3"
+                               maxlength="100"
+                               pattern="^[A-Za-zÀ-ÿ\s]+$"
+                               required
+                               class="w-full px-5 py-3 rounded-2xl border border-gray-300
+                                      bg-gray-50 focus:bg-white
+                                      focus:ring-4 focus:ring-blue-500/10
+                                      focus:border-blue-500 outline-none transition"
+                               placeholder="Digite seu nome completo">
+
+                        @error('name')
+                            <p class="text-red-500 text-sm mt-2">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
                     </div>
 
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium text-gray-700 ml-1">Email Institucional</label>
-                        <input type="email" name="email"
-                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                               placeholder="exemplo@escola.com" required>
+
+                    <!-- EMAIL -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Email Institucional
+                        </label>
+
+                        <input type="email"
+                               name="email"
+                               value="{{ old('email') }}"
+                               required
+                               class="w-full px-5 py-3 rounded-2xl border border-gray-300
+                                      bg-gray-50 focus:bg-white
+                                      focus:ring-4 focus:ring-blue-500/10
+                                      focus:border-blue-500 outline-none transition"
+                               placeholder="exemplo@universidade.com">
+
+                        @error('email')
+                            <p class="text-red-500 text-sm mt-2">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
                     </div>
 
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium text-gray-700 ml-1">Senha</label>
-                        <input type="password" name="password"
-                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                               required>
+
+                    <!-- SENHA -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Senha
+                        </label>
+
+                        <input type="password"
+                               name="password"
+                               minlength="6"
+                               required
+                               class="w-full px-5 py-3 rounded-2xl border border-gray-300
+                                      bg-gray-50 focus:bg-white
+                                      focus:ring-4 focus:ring-blue-500/10
+                                      focus:border-blue-500 outline-none transition"
+                               placeholder="Mínimo 6 caracteres">
+
+                        @error('password')
+                            <p class="text-red-500 text-sm mt-2">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
                     </div>
 
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium text-gray-700 ml-1">Confirmar Senha</label>
-                        <input type="password" name="password_confirmation"
-                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                               required>
+
+                    <!-- CONFIRMAR SENHA -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Confirmar Senha
+                        </label>
+
+                        <input type="password"
+                               name="password_confirmation"
+                               minlength="6"
+                               required
+                               class="w-full px-5 py-3 rounded-2xl border border-gray-300
+                                      bg-gray-50 focus:bg-white
+                                      focus:ring-4 focus:ring-blue-500/10
+                                      focus:border-blue-500 outline-none transition"
+                               placeholder="Repita sua senha">
+
                     </div>
+
                 </div>
+
             </section>
 
-            <hr class="border-gray-100">
 
+            <!-- DIVIDER -->
+            <div class="border-t border-gray-100"></div>
+
+
+            <!-- DADOS ACADÉMICOS -->
             <section>
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 bg-green-50 text-green-600 rounded-full flex items-center justify-center font-bold text-sm">
+
+                <div class="flex items-center gap-4 mb-8">
+
+                    <div class="w-12 h-12 rounded-2xl bg-green-100
+                                flex items-center justify-center
+                                text-green-600 font-bold text-lg">
+
                         2
+
                     </div>
-                    <h2 class="text-lg font-semibold text-gray-800">Dados Acadêmicos</h2>
+
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">
+                            Informações Académicas
+                        </h2>
+
+                        <p class="text-sm text-gray-500">
+                            Dados relacionados ao seu curso
+                        </p>
+                    </div>
+
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2 space-y-1">
-                        <label class="text-sm font-medium text-gray-700 ml-1">Curso</label>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
+
+                    <!-- CURSO -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Curso
+                        </label>
+
                         <select name="curso_id"
-                                class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-600 transition-all"
-                                required>
-                            <option value="">Selecionar seu curso</option>
+                                required
+                                class="w-full px-5 py-3 rounded-2xl border border-gray-300
+                                       bg-gray-50 focus:bg-white
+                                       focus:ring-4 focus:ring-green-500/10
+                                       focus:border-green-500 outline-none transition">
+
+                            <option value="">
+                                Selecionar curso
+                            </option>
+
                             @foreach($cursos as $curso)
-                                <option value="{{ $curso->id }}">{{ $curso->nome }}</option>
+
+                                <option value="{{ $curso->id }}"
+                                    {{ old('curso_id') == $curso->id ? 'selected' : '' }}>
+
+                                    {{ $curso->nome }}
+
+                                </option>
+
                             @endforeach
+
                         </select>
+
+                        @error('curso_id')
+                            <p class="text-red-500 text-sm mt-2">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
                     </div>
 
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium text-gray-700 ml-1">Ano de Frequência</label>
-                        <input type="number" name="ano_frequencia" min="1" max="6"
-                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                               placeholder="Ex: 4" required>
+
+                    <!-- ANO -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Ano de Frequência
+                        </label>
+
+                        <select name="ano_frequencia"
+                                required
+                                class="w-full px-5 py-3 rounded-2xl border border-gray-300
+                                       bg-gray-50 focus:bg-white
+                                       focus:ring-4 focus:ring-blue-500/10
+                                       focus:border-blue-500 outline-none transition">
+
+                            <option value="">
+                                Selecionar ano
+                            </option>
+
+                            <option value="4"
+                                {{ old('ano_frequencia') == 4 ? 'selected' : '' }}>
+                                4º Ano
+                            </option>
+
+                            <option value="5"
+                                {{ old('ano_frequencia') == 5 ? 'selected' : '' }}>
+                                5º Ano
+                            </option>
+
+                        </select>
+
+                        @error('ano_frequencia')
+                            <p class="text-red-500 text-sm mt-2">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
                     </div>
 
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium text-gray-700 ml-1">Nº de Matrícula</label>
-                        <input type="text" name="numero_matricula"
-                               class="w-full px-4 py-2.5 bg-white border border-blue-200 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-semibold text-blue-600 uppercase"
-                               placeholder="Matrícula" required>
+
+                    <!-- MATRÍCULA -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Número de Matrícula
+                        </label>
+
+                        <input type="text"
+                               name="numero_matricula"
+                               value="{{ old('numero_matricula') }}"
+                               required
+                               class="w-full px-5 py-3 rounded-2xl border border-gray-300
+                                      bg-gray-50 focus:bg-white
+                                      focus:ring-4 focus:ring-blue-500/10
+                                      focus:border-blue-500 outline-none transition"
+                               placeholder="Digite sua matrícula">
+
+                        @error('numero_matricula')
+                            <p class="text-red-500 text-sm mt-2">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
                     </div>
 
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium text-gray-700 ml-1">BI (Nº Identidade)</label>
-                        <input type="text" name="bi"
-                               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all uppercase"
-                               placeholder="Nº do BI" required>
+
+                    <!-- BI -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Bilhete de Identidade
+                        </label>
+
+                        <input type="text"
+                               name="bi"
+                               value="{{ old('bi') }}"
+                               required
+                               maxlength="14"
+                               pattern="^\d{9}[A-Za-z]{2}\d{3}$"
+                               class="w-full px-5 py-3 rounded-2xl border border-gray-300
+                                      bg-gray-50 uppercase
+                                      focus:bg-white
+                                      focus:ring-4 focus:ring-blue-500/10
+                                      focus:border-blue-500 outline-none transition"
+                               placeholder="000000000LA000">
+
+                        @error('bi')
+                            <p class="text-red-500 text-sm mt-2">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
                     </div>
 
-                    <div class="space-y-1">
-                        <label class="text-sm font-medium text-gray-700 ml-1">Regime de Estudo</label>
+
+                    <!-- REGIME -->
+                    <div class="md:col-span-2">
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Regime de Estudo
+                        </label>
+
                         <select name="regime"
-                                class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
-                            <option value="Regular">Regular</option>
-                            <option value="Pós Laboral">Pós Laboral</option>
+                                required
+                                class="w-full px-5 py-3 rounded-2xl border border-gray-300
+                                       bg-gray-50 focus:bg-white
+                                       focus:ring-4 focus:ring-blue-500/10
+                                       focus:border-blue-500 outline-none transition">
+
+                            <option value="Regular"
+                                {{ old('regime') == 'Regular' ? 'selected' : '' }}>
+                                Regular
+                            </option>
+
+                            <option value="Pós Laboral"
+                                {{ old('regime') == 'Pós Laboral' ? 'selected' : '' }}>
+                                Pós Laboral
+                            </option>
+
                         </select>
+
                     </div>
+
                 </div>
+
             </section>
+
         </div>
 
-        <div class="px-8 py-6 bg-gray-50 border-t border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div class="flex gap-6">
-                <a href="{{ route('login') }}" class="text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors">
-                    Já possui conta? Entrar
+
+        <!-- FOOTER -->
+        <div class="px-10 py-6 bg-gray-50 border-t border-gray-100
+                    flex flex-col md:flex-row justify-between items-center gap-5">
+
+            <div class="flex gap-6 text-sm">
+
+                <a href="{{ route('login') }}"
+                   class="text-gray-500 hover:text-blue-600 transition">
+                    Já possui conta?
                 </a>
-                <a href="{{ route('home') }}" class="text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors">
+
+                <a href="{{ route('home') }}"
+                   class="text-gray-500 hover:text-blue-600 transition">
                     Página Inicial
                 </a>
+
             </div>
 
-            <div class="flex gap-3">
-                <a href="{{ route('estudantes.index') }}"
-                   class="px-6 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-all">
-                    Cancelar
-                </a>
+
+            <div class="flex gap-4">
+
+                <button type="reset"
+                    class="px-6 py-3 rounded-xl bg-gray-200
+                           hover:bg-gray-300 font-semibold transition">
+
+                    Limpar
+
+                </button>
 
                 <button type="submit"
-                    class="px-8 py-2.5 text-sm font-bold bg-blue-600 text-white rounded-xl shadow-md shadow-blue-500/20 hover:bg-blue-700 active:scale-95 transition-all">
-                    Concluir Registro
-                </button>
-            </div>
-        </div>
-    </form>
+                    class="px-8 py-3 rounded-xl bg-blue-600
+                           hover:bg-blue-700 text-white font-bold
+                           shadow-lg shadow-blue-500/20 transition">
 
-    <div class="mt-8 text-center">
-        <p class="text-xs text-gray-400">
-            Dificuldades no cadastro? Entre em contato com a Secretaria Acadêmica.
-        </p>
-    </div>
+                    Concluir Registro
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
 
 </div>
 

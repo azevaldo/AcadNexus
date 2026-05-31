@@ -57,36 +57,49 @@
                         </div>
                     </td>
 
-                    <td class="px-8 py-5 text-right space-x-4">
-                    <button onclick="openModal('regimeModal{{ $curso->id }}')" 
-       class="text-amber-600 hover:text-amber-800 transition" 
-       title="Filtrar Estudantes por Regime">
-        🎓
-    </button>
-    <a href="{{ route('cursos.campanhas', $curso->id) }}" 
-       class="text-indigo-600 hover:text-indigo-800 transition" 
-       title="Campanhas">
-        📢
-    </a>
-                        @hasanyrole('secretaria|admin')
-                        <button onclick="openModal('editCursoModal{{ $curso->id }}')"
-                                class="text-blue-600 hover:text-blue-800 transition" 
-                                title="Editar ">
-                            ✏️
-                        </button>
+ <td class="px-8 py-5 text-right">
+    <div class="flex justify-end items-center gap-4">
 
-                        <button onclick="openModal('deleteCursoModal{{ $curso->id }}')"
-                                class="text-red-600 hover:text-red-800 transition" 
-                                title="Eliminar">
-                            🗑️
-                        </button>
-                        @endhasanyrole
-                    </td>
+        <!-- ESTUDANTES -->
+        <button onclick="openModal('regimeModal{{ $curso->id }}')"
+                class="text-slate-500 hover:text-amber-600 transition duration-200"
+                title="Filtrar Estudantes">
+            <i class="fas fa-user-graduate"></i>
+        </button>
+
+        <!-- CAMPANHAS -->
+        <a href="{{ route('cursos.campanhas', $curso->id) }}"
+           class="text-slate-500 hover:text-indigo-600 transition duration-200"
+           title="Campanhas">
+            <i class="fas fa-bullhorn"></i>
+        </a>
+
+        @hasanyrole('secretaria|admin')
+
+        <!-- EDITAR -->
+        <button onclick="openModal('editCursoModal{{ $curso->id }}')"
+                class="text-slate-500 hover:text-blue-600 transition duration-200"
+                title="Editar Curso">
+            <i class="fas fa-pen-to-square"></i>
+        </button>
+
+        <!-- ELIMINAR -->
+        <button onclick="openModal('deleteCursoModal{{ $curso->id }}')"
+                class="text-slate-500 hover:text-red-600 transition duration-200"
+                title="Eliminar Curso">
+            <i class="fas fa-trash"></i>
+        </button>
+
+        @endhasanyrole
+
+    </div>
+</td>
                 </tr>
-{{-- MODAL DE SELEÇÃO DE REGIME --}}
+{{-- MODAL DE SELEÇÃO DE REGIME E FILTROS AVANÇADOS --}}
 <div id="regimeModal{{ $curso->id }}"
-     class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
-    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-8 animate-fadeIn text-left">
+     class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 animate-fadeIn text-left max-h-[90vh] overflow-y-auto">
+        
         <div class="flex items-center gap-3 mb-6">
             <div class="p-3 bg-amber-100 text-amber-600 rounded-2xl">
                 <i class="fas fa-user-graduate"></i>
@@ -96,41 +109,82 @@
                 <p class="text-xs text-gray-500">{{ $curso->nome }}</p>
             </div>
         </div>
-{{-- Dentro do seu regimeModal{{ $curso->id }} --}}
-<form method="GET" action="{{ route('cursos.estudantes', $curso->id) }}">
-    <div class="space-y-4">
-        {{-- Filtro de Regime --}}
-        <div>
-            <label class="block text-sm font-semibold mb-2 text-gray-600">Regime</label>
-            <select name="regime" class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-amber-500 focus:outline-none bg-gray-50 text-sm">
-                <option value="">Todos os Regimes</option>
-                <option value="Regular">Regular</option>
-                <option value="Pós Laboral">Pós Laboral</option>
-            </select>
-        </div>
 
-        {{-- Novo Filtro de Ano de Frequência (Opcional) --}}
-        <div>
-            <label class="block text-sm font-semibold mb-2 text-gray-600">Ano de Frequência</label>
-            <select name="ano" class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-amber-500 focus:outline-none bg-gray-50 text-sm">
-                <option value="">Todos os Anos</option>
-                @for ($i = 1; $i <= 5; $i++) {{-- Ajuste o limite de anos conforme necessário --}}
-                    <option value="{{ $i }}">{{ $i }}º Ano</option>
-                @endfor
-            </select>
-        </div>
-    </div>
+        <form method="GET" action="{{ route('cursos.estudantes', $curso->id) }}">
+            <div class="space-y-4">
+                
+                {{-- Filtro de Nome --}}
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Nome do Estudante</label>
+                    <input type="text" name="nome" placeholder="Filtrar por nome..." 
+                           class="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-amber-500 focus:outline-none bg-gray-50 text-sm">
+                </div>
 
-    <div class="flex justify-end gap-3 mt-8">
-        <button type="button" onclick="closeModal('regimeModal{{ $curso->id }}')"
-                class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium">
-            Cancelar
-        </button>
-        <button type="submit" class="px-6 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600 shadow-lg font-bold">
-            Filtrar
-        </button>
+                {{-- Filtro de Email --}}
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Email</label>
+                    <input type="text" name="email" placeholder="Filtrar por email..." 
+                           class="w-full px-4 py-2.5 rounded-xl border focus:ring-2 focus:ring-amber-500 focus:outline-none bg-gray-50 text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    {{-- Filtro de Regime --}}
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Regime</label>
+                        <select name="regime" class="w-full px-3 py-2.5 rounded-xl border focus:ring-2 focus:ring-amber-500 focus:outline-none bg-gray-50 text-sm">
+                            <option value="">Todos</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Pós Laboral">Pós Laboral</option>
+                        </select>
+                    </div>
+
+                    {{-- Filtro de Ano de Frequência --}}
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Ano Frequência</label>
+                        <select name="ano" class="w-full px-3 py-2.5 rounded-xl border focus:ring-2 focus:ring-amber-500 focus:outline-none bg-gray-50 text-sm">
+                            <option value="">Todos</option>
+                            @for ($i = 1; $i <= 5; $i++)
+                                <option value="{{ $i }}">{{ $i }}º Ano</option>
+                            @endfor
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    {{-- Filtro de Tutor --}}
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Tutor Principal</label>
+                        <select name="tutor_status" class="w-full px-3 py-2.5 rounded-xl border focus:ring-2 focus:ring-amber-500 focus:outline-none bg-gray-50 text-sm">
+                            <option value="">Todos</option>
+                            <option value="com_tutor">Com Tutor</option>
+                            <option value="sem_tutor">Sem Tutor</option>
+                        </select>
+                    </div>
+
+                    {{-- Filtro de Co-Tutor --}}
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Co-Tutor</label>
+                        <select name="cotutor_status" class="w-full px-3 py-2.5 rounded-xl border focus:ring-2 focus:ring-amber-500 focus:outline-none bg-gray-50 text-sm">
+                            <option value="">Todos</option>
+                            <option value="com_cotutor">Com Co-Tutor</option>
+                            <option value="sem_cotutor">Sem Co-Tutor</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="flex justify-end gap-3 mt-8">
+                <button type="button" onclick="closeModal('regimeModal{{ $curso->id }}')"
+                        class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium text-sm transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-6 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600 shadow-lg shadow-amber-100 font-bold text-sm transition">
+                    Filtrar Estudantes
+                </button>
+            </div>
+        </form>
     </div>
-</form>    </div>
 </div>
                 <div id="editCursoModal{{ $curso->id }}"
                      class="fixed inset-0 bg-black/50 backdrop-blur-sm
@@ -142,8 +196,21 @@
                             @csrf
                             @method('PUT')
                             <label class="block text-sm font-semibold mb-2 text-gray-600">Nome do Curso</label>
-                            <input type="text" name="nome" value="{{ $curso->nome }}" required
-                                   class="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 focus:outline-none">
+<input type="text"
+       name="nome"
+       value="{{ $curso->nome }}"
+       required
+       minlength="3"
+       maxlength="100"
+       pattern="^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$"
+       title="O nome deve possuir entre 3 e 100 caracteres e conter apenas letras, números e espaços."
+       class="w-full px-4 py-3 rounded-xl border
+              focus:ring-2 focus:ring-blue-500
+              focus:outline-none">
+
+<p class="text-xs text-gray-500 mt-2">
+    Mínimo de 3 caracteres. Apenas letras, números e espaços.
+</p>
                             
                             <div class="flex justify-end gap-3 mt-6">
                                 <button type="button" onclick="closeModal('editCursoModal{{ $curso->id }}')"
@@ -180,19 +247,36 @@
             </tbody>
         </table>
     </div>
+     @if($cursos->hasPages())
+        <div class="px-6 py-5 bg-slate-50/50 border-t border-slate-100">
+            {{ $cursos->links() }}
+        </div>
+        @endif
 
     <div id="createCursoModal"
          class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 animate-fadeIn">
             <h2 class="text-xl font-bold mb-6 text-gray-800">Novo Curso</h2>
-            <form method="POST" action="{{ route('cursos.store') }}">
+            <form method="POST" action="{{ route('cursos.store') }}" onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
                 @csrf
                 <input type="hidden" name="departamento_id" value="{{ $departamento->id }}">
                 
                 <label class="block text-sm font-semibold mb-2 text-gray-600">Nome do Curso</label>
-                <input type="text" name="nome" required
-                       class="w-full px-4 py-2 rounded-xl border focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                       placeholder="Ex: Engenharia Informática">
+                <input type="text"
+       name="nome"
+       required
+       minlength="3"
+       maxlength="100"
+       pattern="^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$"
+       title="O nome deve possuir entre 3 e 100 caracteres e conter apenas letras, números e espaços."
+       class="w-full px-4 py-3 rounded-xl border
+              focus:ring-2 focus:ring-blue-500
+              focus:outline-none"
+       placeholder="Ex: Engenharia Informática">
+
+<p class="text-xs text-gray-500 mt-2">
+    Mínimo de 3 caracteres. Apenas letras, números e espaços.
+</p>
 
                 <div class="flex justify-end gap-3 mt-6">
                     <button type="button" onclick="closeModal('createCursoModal')"

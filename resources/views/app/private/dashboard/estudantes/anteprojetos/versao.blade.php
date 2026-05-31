@@ -6,22 +6,35 @@
 
 <div class="max-w-4xl mx-auto px-4 py-12">
 
-    <div class="text-center mb-12">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl mb-4 shadow-sm">
-            <i class="fas fa-sync-alt text-2xl"></i>
-        </div>
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
-            Submeter Nova Versão (V{{ $anteprojeto->versoes()->count() + 1 }})
-        </h1>
-        <p class="text-slate-500 text-base mt-2 max-w-md mx-auto">
-            Você está enviando uma atualização para o tema: <br>
-            <span class="font-bold text-slate-700 italic">"{{ $anteprojeto->titulo }}"</span>
-        </p>
-    </div>
+   {{-- Link Único de Navegação Superior --}}
+<div class="mb-6">
+    <a href="{{ route('estudante.anteprojetos.meuAnteprojeto', $anteprojeto->campanha_id) }}" 
+       class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-amber-600 transition-colors group">
+        <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
+        Voltar para Meu Anteprojeto
+    </a>
+</div>
 
+{{-- Cabeçalho Centralizado --}}
+<div class="text-center mb-12">
+    <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl mb-4 shadow-sm">
+        <i class="fas fa-sync-alt text-2xl"></i>
+    </div>
+    
+    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+        Submeter Nova Versão (V{{ $anteprojeto->versoes()->count() + 1 }})
+    </h1>
+    
+    <p class="text-slate-500 text-base mt-2 max-w-md mx-auto">
+        Você está enviando uma atualização para o tema: <br>
+        <span class="font-bold text-slate-700 italic">"{{ $anteprojeto->titulo }}"</span>
+    </p>
+</div>
     <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
 
-        <form method="POST" action="{{ route('estudante.anteprojetos.store_versao', $anteprojeto->id) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('estudante.anteprojetos.store_versao', $anteprojeto->id) }}" enctype="multipart/form-data"
+        onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');"
+        >
             @csrf
 
             <div class="p-8 md:p-12 space-y-10">
@@ -47,28 +60,48 @@
                               required></textarea>
                     <p class="text-[10px] text-slate-400 ml-1 italic">Este comentário ajuda o coordenador a identificar suas melhorias rapidamente.</p>
                 </div>
+             <div>
 
-                <div class="space-y-3">
-                    <label class="flex items-center text-sm font-bold text-slate-700 ml-1">
-                        <i class="fas fa-file-pdf mr-2 text-blue-500"></i>
-                        Novo Documento Atualizado
-                    </label>
-                    
-                    <div class="group relative">
-                        <input type="file" name="arquivo" id="fileInput" class="hidden" accept=".pdf,.doc,.docx" required onchange="updateFileName()">
-                        <label for="fileInput" 
-                               class="flex flex-col items-center justify-center w-full min-h-[180px] border-2 border-dashed border-slate-200 rounded-3xl cursor-pointer bg-slate-50/50 hover:bg-amber-50/50 hover:border-amber-400 transition-all duration-300">
-                            
-                            <div class="flex flex-col items-center justify-center py-6 text-center px-4">
-                                <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 mb-4 group-hover:scale-110 transition-transform">
-                                    <i class="far fa-file-alt text-xl text-slate-400 group-hover:text-amber-600"></i>
-                                </div>
-                                <p class="text-sm font-semibold text-slate-600" id="fileNameDisplay">
-                                    Clique para carregar a nova versão
-                                </p>
-                            </div>
-                        </label>
-                    </div>
+    <label class="block text-sm font-semibold text-slate-700 mb-2">
+        Ficheiro do Anteprojeto
+    </label>
+
+    <input type="file"
+           name="arquivo"
+           id="arquivo"
+           required
+           accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+           class="w-full text-sm text-slate-500
+                  file:mr-4
+                  file:px-5
+                  file:py-3
+                  file:rounded-xl
+                  file:border-0
+                  file:font-semibold
+                  file:bg-blue-50
+                  file:text-blue-700
+                  hover:file:bg-blue-100
+                  border border-slate-200
+                  rounded-xl
+                  p-2
+                  bg-slate-50/50
+                  cursor-pointer
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-blue-500">
+
+    <p class="mt-2 text-xs text-slate-500">
+        Apenas ficheiros PDF, DOC ou DOCX.
+    </p>
+
+    <div id="nomeArquivo"
+         class="hidden mt-3 px-4 py-3 rounded-xl bg-green-50 border border-green-200">
+
+        <span class="text-sm font-medium text-green-700"></span>
+
+    </div>
+
+</div>
                 </div>
 
             </div>

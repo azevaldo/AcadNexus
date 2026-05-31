@@ -14,6 +14,7 @@ class CoordenadorController extends Controller
 {
     public function index()
     {
+        try{
         $coordenadores = Coordenador::with(['departamento','professor.user'])
             ->paginate(10);
 
@@ -25,10 +26,14 @@ class CoordenadorController extends Controller
             'departamentos',
             'professores'
         ));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
     }
 
     public function store(Request $request)
     {
+        try{
         $request->validate([
             'departamento_id' => 'required|exists:departamentos,id',
             'professor_id' => 'required|exists:professores,id',
@@ -36,7 +41,7 @@ class CoordenadorController extends Controller
 
         DB::beginTransaction();
 
-        try {
+         
 
             // 🔒 Verifica se o departamento já tem coordenador ativo
             $departamentoTem = Coordenador::where('departamento_id', $request->departamento_id)

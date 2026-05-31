@@ -90,6 +90,12 @@
                 </tbody>
             </table>
         </div>
+        
+     @if($orientandos->hasPages())
+        <div class="px-6 py-5 bg-slate-50/50 border-t border-slate-100">
+            {{ $orientandos->links() }}
+        </div>
+        @endif
     </div>
 </div>
 @endsection

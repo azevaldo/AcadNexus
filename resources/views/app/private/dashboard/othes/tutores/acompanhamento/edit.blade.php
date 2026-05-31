@@ -5,10 +5,33 @@
 @section('content')
 <div class="max-w-5xl mx-auto px-4 py-10">
     
-    <div class="mb-8">
-        <h1 class="text-3xl font-black text-gray-800 uppercase tracking-tight">Editar Cronograma de TCC</h1>
-        <p class="text-gray-500">Estudante: <span class="font-bold text-indigo-600">{{ $acompanhamento->estudante->user->name }}</span></p>
+   <div class="flex items-start gap-4 mb-8">
+    {{-- Botão Voltar Dinâmico --}}
+    @hasanyrole('coordenador|professor|admin')
+    <a href="{{ route('tutor.acompanhamento.show', $acompanhamento) }}" 
+       class="mt-1 flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm shrink-0"
+       title="Voltar para Acompanhamento">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+    @endhasanyrole
+@role('estudante')
+        <a href="{{ route('estudante.acompanhamento.show', $acompanhamento->id) }}" 
+       class="mt-1 flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm shrink-0"
+       title="Voltar para Acompanhamento">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+    @endrole
+ 
+
+    <div>
+        <h1 class="text-3xl font-black text-gray-800 uppercase tracking-tight leading-tight">
+            Editar Cronograma de TCC
+        </h1>
+        <p class="text-gray-500 mt-1 text-sm">
+            Estudante: <span class="font-bold text-indigo-600">{{ $acompanhamento->estudante->user->name }}</span>
+        </p>
     </div>
+</div>
 
     <div x-data="{ 
         fases: {{ json_encode($fasesEdit) }},

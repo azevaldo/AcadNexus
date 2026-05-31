@@ -26,12 +26,12 @@ class ItemMelhoriaController extends Controller
 
     public function store(Request $request)
     {
+        try{
         $request->validate([
             'titulo' => 'required|string|min:3|max:150|unique:itens_melhoria,titulo',
             'descricao' => 'required|string|max:500'
         ]);
-
-        try {
+ 
             DB::beginTransaction();
             ItemMelhoria::create([
                 'titulo' => $request->titulo,
@@ -50,12 +50,13 @@ class ItemMelhoriaController extends Controller
 
     public function update(Request $request, $id)
     {
+        try{
         $request->validate([
             'titulo' => "required|string|min:3|max:150|unique:itens_melhoria,titulo,$id",
             'descricao' => 'required|string|max:500'
         ]);
 
-        try {
+         
             DB::beginTransaction();
             $item = ItemMelhoria::findOrFail($id);
             $item->update([

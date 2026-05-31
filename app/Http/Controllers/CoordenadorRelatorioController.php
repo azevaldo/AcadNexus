@@ -14,6 +14,7 @@ class CoordenadorRelatorioController extends Controller
 {
     public function index()
     {
+        try{
         // 1. Identificar o Coordenador logado
         $coordenador = Coordenador::whereHas('professor', function($query) {
                 $query->where('user_id', Auth::id());
@@ -60,5 +61,8 @@ class CoordenadorRelatorioController extends Controller
             'campanhasAtivas', 
             'professores'
         ));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
     }
 }

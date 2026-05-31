@@ -24,10 +24,27 @@
         <a href="{{ route('dashboard') }}" 
            class="flex items-center p-3 {{ request()->routeIs('dashboard') ? 'bg-blue-800 text-white shadow-md' : 'text-blue-200 hover:bg-blue-800/50' }} rounded-xl transition">
             <i class="fas fa-chart-line w-6 text-center"></i>
-            <span class="ml-3 font-medium">Dashboard</span>
+            <span class="ml-3 font-medium">Painel</span>
         </a>
     </div>
 
+    <div>
+    <a href="{{ route('home') }}" 
+       class="flex items-center p-3 {{ request()->routeIs('home') ? 'bg-blue-800 text-white shadow-md' : 'text-blue-200 hover:bg-blue-800/50' }} rounded-xl transition">
+        <i class="fas fa-home w-6 text-center"></i>
+        <span class="ml-3 font-medium">Página Inicial</span>
+    </a>
+</div>
+@role('estudante')
+<div>
+        <a href="{{route('estudante.ia.index')}}" 
+           class="flex items-center p-3 {{ request()->routeIs('ia.chat') ? 'bg-purple-900 text-white shadow-md border border-purple-700' : 'text-blue-200 hover:bg-purple-950/40 hover:text-purple-300' }} rounded-xl transition group">
+            <i class="fas fa-robot w-6 text-center text-purple-400 group-hover:animate-bounce"></i>
+            <span class="ml-3 font-medium">Assistente IA</span>
+            <span class="ml-auto bg-purple-500/20 text-purple-300 text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-purple-500/30">Beta</span>
+        </a>
+    </div> 
+    @endrole
     @role('estudante')
     <div class="space-y-1">
         <button @click="openMenu = (openMenu === 'estudante' ? null : 'estudante')" 
@@ -62,7 +79,7 @@
         
         <div x-show="openMenu === 'professor'" x-collapse x-cloak class="pl-10 space-y-1">
             <a href="{{ route('tutor.estudantes.index') }}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Meus Orientandos</a>
-            <a href="{{route('professores.campanhas')}}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Avaliações</a>
+ 
             <a href="{{route('solicitacoes.tutor.index')}}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Solicitações Estudantes</a>
             <a href="{{route('professor.relatorios.index')}}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Relatorios</a>
         </div>
@@ -98,6 +115,25 @@
     </div>
     @endhasanyrole
 
+       <div class="space-y-1">
+        <button @click="openMenu = (openMenu === 'estudante2' ? null : 'estudante2')" 
+                class="w-full flex items-center justify-between p-3 text-blue-200 hover:bg-blue-800 rounded-xl transition">
+            <div class="flex items-center">
+    <i class="fas fa-search-plus w-6 text-center text-blue-400"></i>
+    <span class="ml-3 font-medium">Consultas</span>
+</div>
+            <i class="fas fa-chevron-down text-[10px] transition-transform duration-300" :class="openMenu === 'estudante' ? 'rotate-180' : ''"></i>
+        </button>
+        
+        <div x-show="openMenu === 'estudante2'" x-collapse x-cloak class="pl-10 space-y-1">
+            <a href="{{ route('professores.consultas.index') }}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Professores</a>
+         @hasanyrole('admin|coordenador|professor')
+            <a href="{{ route('estudantes.consultas') }}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Estudantes</a>
+            <a href="{{ route('anteprojetosAdmin.index') }}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Anteprojetos</a>
+        
+            @endhasanyrole
+        </div>
+    </div>
     {{-- ITEM DE NOTIFICAÇÕES COM BADGE ALINHADO NO MENU --}}
     <div class="space-y-1">
         <button @click="openMenu = (openMenu === 'professor2' ? null : 'professor2')" 

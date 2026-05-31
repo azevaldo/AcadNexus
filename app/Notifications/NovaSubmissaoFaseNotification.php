@@ -29,7 +29,7 @@ class NovaSubmissaoFaseNotification extends Notification
         $acompanhamento = $fase->acompanhamento;
         $estudanteUser = $acompanhamento->estudante->user;
         
-        $url = route('tutor.acompanhamento.show', ['id' => $acompanhamento->id]);
+        $url = route('tutor.acompanhamento.show', ['acompanhamento' => $acompanhamento]);
 
         return (new MailMessage)
             ->subject('📂 Nova Submissão de Fase de TCC')
@@ -49,7 +49,7 @@ class NovaSubmissaoFaseNotification extends Notification
         return [
             'titulo' => 'Nova Submissão de Fase de TCC',
             'mensagem' => "O seu orientando {$estudanteUser->name} realizou uma submissão de arquivo na {$fase->fase}.",
-            'url' => route('tutor.acompanhamento.show', ['id' => $acompanhamento->id, 'target' => 'acompanhamento_fase', 'target_id' => $fase->id]),
+            'url' => route('tutor.acompanhamento.show', ['acompanhamento' => $acompanhamento, 'target' => 'acompanhamento_fase', 'target_id' => $fase->id]),
             'tipo' => 'acompanhamento_submissao'
         ];
     }

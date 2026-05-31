@@ -1,131 +1,210 @@
-@extends('app.private.dashboard.app..templete')
+ @extends('app.private.dashboard.app..templete')
 
 @section('title','Adicionar Campanha')
 
 @section('content')
 
-<div class="max-w-4xl mx-auto px-6 py-8">
- 
-<!-- HEADER -->
-<div class="mb-6">
-    <h1 class="text-2xl font-semibold text-gray-800">
-        Adicionar Campanha
-    </h1>
-    <p class="text-sm text-gray-500 mt-1">
-        Crie uma nova campanha no sistema
-    </p>
-</div>
+<div class="max-w-5xl mx-auto px-8 py-10">
+
+    <!-- HEADER -->
+    <div class="mb-8">
+
+        <h1 class="text-3xl font-bold text-gray-800">
+            Adicionar Campanha
+        </h1>
+
+        <p class="text-gray-500 mt-2">
+            Crie uma nova campanha para submissão de anteprojetos
+        </p>
+
+    </div>
 
 
-<form method="POST"
-      action="{{ route('campanhas.store') }}"
-      class="bg-white border border-gray-200 rounded-xl">
+    <form method="POST"
+          action="{{ route('campanhas.store') }}"
+          class="bg-white border border-gray-200 rounded-3xl shadow-xl overflow-hidden" onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
 
-    @csrf
+        @csrf
 
-    <div class="p-6 space-y-8">
+        <div class="p-8 space-y-8">
 
-        <!-- CAMPANHA -->
-        <div>
+            <!-- ERROS -->
+            @if ($errors->any())
 
-            <h2 class="text-sm font-semibold text-gray-700 mb-4">
-                Informações da Campanha
-            </h2>
+                <div class="bg-red-50 border border-red-200 rounded-2xl p-5">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="flex items-center gap-2 mb-3">
 
-                <!-- CURSO -->
-                <div class="md:col-span-2">
-                    <label class="text-sm text-gray-600">
-                        Curso
-                    </label>
+                        <span class="text-red-600 text-lg">⚠️</span>
 
-                    <select name="curso_id"
-                            class="w-full mt-1 px-3 py-2 border rounded-lg
-                                   focus:ring-2 focus:ring-blue-500"
-                            required>
+                        <h2 class="font-semibold text-red-700">
+                            Corrija os seguintes erros
+                        </h2>
 
-                        <option value="">Selecionar curso</option>
+                    </div>
 
-                        @foreach($cursos as $curso)
+                    <ul class="space-y-2 text-sm text-red-600">
 
-                            <option value="{{ $curso->id }}">
-                                {{ $curso->nome }} - {{ $curso->departamento->nome }}
-                            </option>
+                        @foreach ($errors->all() as $error)
+
+                            <li>• {{ $error }}</li>
 
                         @endforeach
 
-                    </select>
-                </div>
-
-
-                <!-- TITULO -->
-                <div class="md:col-span-2">
-                    <label class="text-sm text-gray-600">
-                        Título
-                    </label>
-
-                    <input type="text"
-                           name="titulo"
-                           class="w-full mt-1 px-3 py-2 border rounded-lg
-                                  focus:ring-2 focus:ring-blue-500"
-                           required>
-                </div>
-
-
-                <!-- DESCRIÇÃO -->
-                <div class="md:col-span-2">
-
-                    <label class="text-sm text-gray-600">
-                        Descrição
-                    </label>
-
-                    <textarea name="descricao"
-                              rows="4"
-                              class="w-full mt-1 px-3 py-2 border rounded-lg
-                                     focus:ring-2 focus:ring-blue-500"
-                              required></textarea>
+                    </ul>
 
                 </div>
 
+            @endif
 
-                <!-- PRAZO -->
-                <div>
-                    <label class="text-sm text-gray-600">
-                        Prazo de Submissão
-                    </label>
 
-                    <input type="date"
-                           name="prazo_submissao"
-                           class="w-full mt-1 px-3 py-2 border rounded-lg
-                                  focus:ring-2 focus:ring-blue-500">
+            <!-- INFORMAÇÕES -->
+            <div>
+
+                <h2 class="text-lg font-semibold text-gray-800 mb-6">
+                    Informações da Campanha
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- CURSO -->
+                    <div class="md:col-span-2">
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Curso
+                        </label>
+
+                        <select
+                            name="curso_id"
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl
+                                   focus:ring-4 focus:ring-blue-500/20
+                                   focus:border-blue-500 outline-none transition">
+
+                            <option value="">
+                                Selecionar curso
+                            </option>
+
+                            @foreach($cursos as $curso)
+
+                                <option value="{{ $curso->id }}"
+                                    {{ old('curso_id') == $curso->id ? 'selected' : '' }}>
+
+                                    {{ $curso->nome }} - {{ $curso->departamento->nome }}
+
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- TITULO -->
+                    <div class="md:col-span-2">
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Título da Campanha
+                        </label>
+
+                        <input
+                            type="text"
+                            name="titulo"
+                            required
+                            minlength="10"
+                            maxlength="255"
+                            value="{{ old('titulo') }}"
+                            placeholder="Ex: Campanha de Submissão de Anteprojetos 2026"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl
+                                   focus:ring-4 focus:ring-blue-500/20
+                                   focus:border-blue-500 outline-none transition">
+
+                        <p class="text-xs text-gray-400 mt-2">
+                            O título deve ter no mínimo 10 caracteres
+                        </p>
+
+                    </div>
+
+
+                    <!-- DESCRIÇÃO -->
+                    <div class="md:col-span-2">
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Descrição
+                        </label>
+
+                        <textarea
+                            name="descricao"
+                            rows="6"
+                            required
+                            minlength="20"
+                            maxlength="5000"
+                            placeholder="Descreva os objetivos e detalhes da campanha..."
+                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl
+                                   focus:ring-4 focus:ring-blue-500/20
+                                   focus:border-blue-500 outline-none transition resize-none">{{ old('descricao') }}</textarea>
+
+                        <p class="text-xs text-gray-400 mt-2">
+                            A descrição deve ter no mínimo 20 caracteres
+                        </p>
+
+                    </div>
+
+
+                    <!-- PRAZO -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Prazo de Submissão
+                        </label>
+
+                        <input
+                            type="date"
+                            name="prazo_submissao"
+                            required
+                            min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                            value="{{ old('prazo_submissao') }}"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl
+                                   focus:ring-4 focus:ring-blue-500/20
+                                   focus:border-blue-500 outline-none transition">
+
+                        <p class="text-xs text-gray-400 mt-2">
+                            A data deve ser superior à data atual
+                        </p>
+
+                    </div>
+
                 </div>
+
             </div>
 
         </div>
 
-    </div>
 
+        <!-- FOOTER -->
+        <div class="flex justify-end gap-4 px-8 py-5 border-t bg-gray-50">
 
-    <!-- FOOTER -->
-    <div class="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50 rounded-b-xl">
+            <a href="{{ route('campanhas.index') }}"
+               class="px-6 py-3 rounded-2xl bg-gray-200
+                      hover:bg-gray-300 transition font-medium">
 
-        <a href="{{ route('campanhas.index') }}"
-           class="px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300">
-            Cancelar
-        </a>
+                Cancelar
 
-        <button type="submit"
-            class="px-5 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            </a>
 
-            Salvar Campanha
+            <button type="submit"
+                class="px-8 py-3 rounded-2xl bg-blue-600
+                       hover:bg-blue-700 transition text-white
+                       font-semibold shadow-lg shadow-blue-500/20">
 
-        </button>
+                Salvar Campanha
 
-    </div>
+            </button>
 
-</form>
- 
+        </div>
+
+    </form>
 
 </div>
 

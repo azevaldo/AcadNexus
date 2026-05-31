@@ -11,9 +11,9 @@
             <p class="text-sm text-gray-500">Lista de estudante</p>
         </div>
  @hasanyrole('admin|coordenador')
- <a href="{{ route('campanhas.show', $campanha->id) }}"" 
+ <a href="{{ route('campanhas.show', $campanha->id) }}"
                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-semibold transition duration-200 flex items-center gap-2">
-                <i class="fas fa-arrow-left text-xs"></i> Voltar
+                <i class="fas fa-arrow-left text-xs"></i> 
             </a>
        <button
 onclick="openModal('addStudentModal')"
@@ -70,7 +70,14 @@ text-white px-6 py-3 rounded-xl font-semibold shadow">
                     </td>
 
                     <td class="px-6 py-4 text-right space-x-3">
- @hasanyrole('admin|coordenador|secretaria')
+
+                    <a href="{{ route('estudantes.show', $estudante->id) }}" 
+   class="inline-flex items-center justify-center p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" 
+   title="Ver Detalhes do Estudante">
+    <i class="fas fa-info-circle text-xs"></i>
+</a>
+ @hasanyrole('admin|coordenador')
+ @if($estudante->anteprojetos->isEmpty())
          <button onclick="openModal('removeStudentModal{{ $estudante->id }}')"
 class="text-red-600 hover:text-red-800 text-lg"
 title="Desassociar da campanha">
@@ -78,6 +85,7 @@ title="Desassociar da campanha">
 ❌
 
 </button>
+@endif
 @endhasanyrole
                     </td>
 

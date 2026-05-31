@@ -9,8 +9,7 @@
             
             <div class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-600">
                 <a href="#sobre" class="hover:text-blue-700 transition">Sobre o Sistema</a>
-                <a href="#fluxo" class="hover:text-blue-700 transition">Fluxo de TCC</a>
-                <a href="#suporte" class="hover:text-blue-700 transition">Suporte</a>
+             
                 <a href="/login" class="bg-blue-700 text-white px-6 py-2.5 rounded-full hover:bg-blue-800 transition shadow-lg shadow-blue-200">
                     Aceder ao Portal <i class="fas fa-arrow-right ml-2 text-xs"></i>
                 </a>

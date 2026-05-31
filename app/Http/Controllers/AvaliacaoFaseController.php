@@ -11,6 +11,7 @@ class AvaliacaoFaseController extends Controller
 {
     public function store(Request $request, $faseId)
     {
+        try{
         $request->validate([
             'status' => 'required|in:aprovado,ajustes,pendente',
             'descricao' => 'required|string|min:5',
@@ -41,5 +42,8 @@ class AvaliacaoFaseController extends Controller
         }
 
         return redirect()->back()->with('success', 'Avaliação publicada com sucesso!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
     }
 }

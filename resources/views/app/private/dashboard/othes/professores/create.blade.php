@@ -41,11 +41,20 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">
                         Nome
                     </label>
-                    <input type="text" name="name"
-                           value="{{ old('name') }}"
-                           class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                           placeholder="Nome completo"
-                           required>
+                    <input type="text"
+       name="nome"
+      
+       required
+       minlength="3"
+       maxlength="100"
+       pattern="^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$"
+       title="O nome deve possuir entre 3 e 100 caracteres e conter apenas letras, números e espaços."
+       class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-nonee">
+
+<p class="text-xs text-gray-500 mt-2">
+    Mínimo de 3 caracteres. Apenas letras, números e espaços.
+</p>
+                     
                 </div>
 
                 <div>

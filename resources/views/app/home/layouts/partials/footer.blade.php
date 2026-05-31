@@ -5,9 +5,10 @@
                 <p class="text-blue-400 text-xs mt-1">© 2026 Todos os direitos reservados.</p>
             </div>
             <div class="flex space-x-6 text-sm">
-                <a href="#" class="text-blue-200 hover:text-white transition">Políticas</a>
-                <a href="#" class="text-blue-200 hover:text-white transition">Termos</a>
-                <a href="#" class="text-blue-200 hover:text-white transition">Contacto</a>
-            </div>
+               {{--
+               <a href="#" class="text-blue-200 hover:text-white transition">Contacto</a>
+
+               --}}  
+                            </div>
         </div>
     </footer>

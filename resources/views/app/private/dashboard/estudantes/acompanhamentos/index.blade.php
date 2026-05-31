@@ -17,7 +17,11 @@
 
             <h2 class="text-2xl font-black text-gray-900 uppercase leading-none mb-2">TCC - Orientação</h2>
             <p class="text-sm text-gray-600 mb-6 font-medium">Tutor: <span class="text-gray-900 font-black underline">{{ $acomp->tutor->user->name }}</span></p>
-
+       <a href="{{ route('professores.show', $acomp->tutor->id) }}" 
+           class="inline-flex items-center justify-center ml-1 text-slate-400 hover:text-blue-600 transition-colors" 
+           title="Ver Perfil do Professor">
+            <i class="fas fa-info-circle text-xs"></i>
+        </a>
             <div class="border-t-2 border-gray-100 pt-6 flex justify-between items-center">
                 <div class="text-left">
                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Início do Processo</p>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AcompanhamentoTcc;
 use App\Models\Anteprojeto;
 use App\Models\AvaliacaoFase;
+use App\Models\SubmissaoFase;
 use App\Models\Estudante;
 use App\Models\EstudanteTutor;
 use App\Models\FaseTcc;
@@ -18,6 +19,7 @@ class AcompanhamentoTccController extends Controller
 {
      public function inicio(Estudante $estudante)
 {
+    try{
     $tutor = Auth::user()->professor;
 
     // 1. Verifica o vínculo na tabela estudante_tutores
@@ -44,7 +46,10 @@ class AcompanhamentoTccController extends Controller
 
     // RETORNO DA VIEW: Apontando exatamente para o arquivo que você mandou
     return view('app.private.dashboard.othes.tutores.acompanhamento.inicio', compact('estudante', 'vinculo', 'anteprojeto'));
-}
+} catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+    }
 public function storeBasic(Request $request, Estudante $estudante)
     {
         try {
@@ -75,6 +80,7 @@ public function storeBasic(Request $request, Estudante $estudante)
     // PASSO 2: View para Criar as Fases (A que você enviou, adaptada)
     public function createFases(AcompanhamentoTcc $acompanhamento)
     {
+        try{
         if(!$acompanhamento->fases->isEmpty()){
             return back()->with('error','Cronograma já foi criado');
         }
@@ -101,11 +107,16 @@ $estudante=Estudante::findOrFail($acompanhamento->estudante_id);
     return view('app.private.dashboard.othes.tutores.acompanhamento.create', compact('estudante', 'vinculo', 'anteprojeto','acompanhamento'));
 
      //   return view('app.private.dashboard.othes.tutores.acompanhamento.configurar_fases', compact('acompanhamento'));
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
     }
+  
 
     // PASSO 3: Salvar o Cronograma
     public function storeFases(Request $request, AcompanhamentoTcc $acompanhamento)
     {
+        try{
         $request->validate([
             'mes_referencia' => 'required',
             'fases.*.fase'   => 'required|string',
@@ -113,7 +124,7 @@ $estudante=Estudante::findOrFail($acompanhamento->estudante_id);
             'fases.*.mes_fim'    => 'required|integer',
         ]);
 
-        try {
+        
             DB::transaction(function () use ($request, $acompanhamento) {
                 // Atualiza o mês de referência e ativa o processo
                 $acompanhamento->update([
@@ -148,31 +159,76 @@ return redirect()->route('tutor.acompanhamento.show', $acompanhamento->id)
     public function index()
     {
         //
-    }public function avaliarFase(Request $request, FaseTcc $fase)
+    }
+    
+    
+    public function show(?AcompanhamentoTcc $acompanhamento = null)
 {
-    // 1. Validação dos dados de entrada
+    // 1. Defesa preventiva: Se o acompanhamento não existir ou for nulo, aborta com 404
+    if (!$acompanhamento || !$acompanhamento->exists) {
+        abort(404, 'Acompanhamento de TCC não encontrado.');
+    }
+
+    try {
+        // 2. Executa a query em lote de visualização apenas para as fases DESTE acompanhamento
+        \App\Models\SubmissaoFase::whereIn('fase_tcc_id', $acompanhamento->fases()->pluck('id'))
+            ->where('visto', false)
+            ->whereIn('id', function ($query) {
+                $query->select(\DB::raw('MAX(id)'))
+                      ->from('submissao_fase')
+                      ->groupBy('fase_tcc_id');
+            })
+            ->update(['visto' => true]);
+
+        // 3. Carrega os relacionamentos em cascata com segurança
+        $acompanhamento->load([
+            'estudante.user',
+            'fases' => function($query) {
+                $query->with(['submissoes' => function($q) {
+                    $q->latest()->with('avaliacao');
+                }]);
+            }
+        ]);
+
+        return view('app.private.dashboard.othes.tutores.acompanhamento.show', compact('acompanhamento'));
+
+    } catch (\Exception $e) {
+        // Se houver qualquer falha estrutural (ex: tabela de fases vazia), não quebra a tela do tutor
+        return redirect()->back()->with('error', 'Erro ao processar visualização: ' . $e->getMessage());
+    }
+}
+// Altere o tipo recebido de SubmissaoFase para apenas a variável $id
+public function avaliarFase(Request $request, $id)
+{
+    try{
     $request->validate([
         'status' => 'required|in:aprovado,ajustes,pendente',
         'descricao' => 'required|string|min:5',
     ]);
 
-    // 2. Segurança: Verificar se o professor logado é realmente o tutor deste acompanhamento
-    $tutor = Auth::user()->professor;
+    // Busca manualmente a submissão com seus relacionamentos no banco
+    $submissao = SubmissaoFase::with('fase.acompanhamento')->findOrFail($id);
+
+ $tutor = Auth::user()->professor;
+    $fase = $submissao->fase;
+
+    if (!$fase || !$fase->acompanhamento) {
+        return redirect()->back()->with('error', 'Dados de acompanhamento não localizados.');
+    }
+
     if ($fase->acompanhamento->tutor_id !== $tutor->id && $fase->acompanhamento->co_tutor_id !== $tutor->id) {
         return redirect()->back()->with('error', 'Você não tem permissão para avaliar esta fase.');
     }
-
-    try {
-        DB::transaction(function () use ($request, $fase, $tutor) {
-            // 3. Atualizar o status da Fase
+ 
+        DB::transaction(function () use ($request, $fase, $submissao, $tutor) {
+            // 2. Atualiza a fase com o status correto ('aprovado' ou 'ajustes')
             $fase->update([
                 'status' => $request->status
             ]);
 
-            // 4. Registrar ou Atualizar o Parecer na tabela avaliacao_fase
-            // Usamos updateOrCreate para caso o tutor queira mudar uma avaliação já feita
+            // 3. Registra o parecer respeitando o ENUM do banco
             AvaliacaoFase::updateOrCreate(
-                ['submissao_fase_id' => $fase->submissao->id], // Chave de busca
+                ['submissao_fase_id' => $submissao->id],
                 [
                     'tutor_id' => $tutor->id,
                     'decisao' => $request->status,
@@ -180,7 +236,7 @@ return redirect()->route('tutor.acompanhamento.show', $acompanhamento->id)
                 ]
             );
 
-            // 5. Lógica Extra: Se todas as fases forem 'aprovado', podemos finalizar o acompanhamento
+            // 4. Se tudo foi aprovado, encerra o fluxo geral
             $totalFases = $fase->acompanhamento->fases()->count();
             $fasesAprovadas = $fase->acompanhamento->fases()->where('status', 'aprovado')->count();
 
@@ -189,25 +245,47 @@ return redirect()->route('tutor.acompanhamento.show', $acompanhamento->id)
             }
         });
 
-        return redirect()->back()->with('success', 'Avaliação da fase registrada com sucesso!');
-
+        return redirect()->back()->with('success', 'Avaliação registrada com sucesso!');
     } catch (\Exception $e) {
         return redirect()->back()->with('error', 'Erro ao salvar avaliação: ' . $e->getMessage());
     }
 }
-public function show(AcompanhamentoTcc $acompanhamento)
-{
-   $acompanhamento->load([
-        'estudante.user',
-        'fases.submissao.avaliacao' // Carregamento em cascata: Fase -> Submissão -> Avaliação
-    ]);
-    //dd($acompanhamento->fases->isEmpty());
-    return view('app.private.dashboard.othes.tutores.acompanhamento.show', compact('acompanhamento'));
-}
+
+    public function destroyAvaliacao(AvaliacaoFase $avaliacao)
+    {
+        try{
+        $tutor = Auth::user()->professor;
+        $fase = $avaliacao->submissao->fase;
+
+        if ($fase->acompanhamento->tutor_id !== $tutor->id && $fase->acompanhamento->co_tutor_id !== $tutor->id) {
+            return redirect()->back()->with('error', 'Você não tem permissão para remover esta avaliação.');
+        }
+ 
+            DB::transaction(function () use ($avaliacao, $fase) {
+                // Remove o registro da avaliação
+                $avaliacao->delete();
+
+                // Faz a fase retornar para o estado de análise padrão de envio
+                $fase->update([
+                    'status' => 'submetido'
+                ]);
+
+                // Se o acompanhamento estava finalizado, reabre-o como ativo
+                if ($fase->acompanhamento->status === 'finalizado') {
+                    $fase->acompanhamento->update(['status' => 'ativo']);
+                }
+            });
+
+            return redirect()->back()->with('success', 'Avaliação removida! O status retornou para submetido.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erro ao remover avaliação: ' . $e->getMessage());
+        }
+    }
     /**
      * Show the form for creating a new resource.
      */public function create(Estudante $estudante)
 {
+    try{
     $tutor = Auth::user()->professor;
 
     // 1. Verifica o vínculo na tabela estudante_tutores
@@ -234,10 +312,14 @@ public function show(AcompanhamentoTcc $acompanhamento)
     }
 
     return view('app.private.dashboard.othes.tutores.acompanhamento.create', compact('estudante', 'vinculo', 'anteprojeto'));
-}
+} catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+    }
 
     public function store(Request $request, Estudante $estudante)
 {
+    try{
     $request->validate([
         'mes_referencia' => 'required', // Formato YYYY-MM do input month
         'fases.*.fase'   => 'required|string',
@@ -245,7 +327,7 @@ public function show(AcompanhamentoTcc $acompanhamento)
         'fases.*.mes_fim'    => 'required|integer|gte:fases.*.mes_inicio',
     ]);
 
-    try {
+   
         return DB::transaction(function () use ($request, $estudante) {
             // 1. Criar o Acompanhamento com a Âncora Temporal
             $acompanhamento = AcompanhamentoTcc::create([
@@ -285,6 +367,7 @@ public function show(AcompanhamentoTcc $acompanhamento)
      */
 public function edit(AcompanhamentoTcc $acompanhamento)
 {
+    try{
    $acompanhamento->load('fases', 'estudante.user', 'tutor.user');
 
     // Mapeamos as fases para o formato que o Alpine.js espera (usando meses relativos)
@@ -300,10 +383,14 @@ public function edit(AcompanhamentoTcc $acompanhamento)
      
 
     return view('app.private.dashboard.othes.tutores.acompanhamento.edit', compact('acompanhamento', 'fasesEdit'));
-}
+} catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+    }
 
 public function update(Request $request, AcompanhamentoTcc $acompanhamento)
 {
+    try{
     $request->validate([
         'mes_referencia' => 'required',
         'fases' => 'required|array|min:1',
@@ -312,7 +399,7 @@ public function update(Request $request, AcompanhamentoTcc $acompanhamento)
         'fases.*.mes_fim' => 'required|integer|gte:fases.*.mes_inicio',
     ]);
 
-    try {
+    
         DB::transaction(function () use ($request, $acompanhamento) {
             // 1. Atualizar o mês de referência caso tenha mudado
             $acompanhamento->update([

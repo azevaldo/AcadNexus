@@ -16,6 +16,69 @@ use Illuminate\Support\Facades\Auth;
 
 class ProfessorController extends Controller
 {
+    public function __construct()
+{
+    // 1. Garantir que o usuário esteja logado
+    $this->middleware('auth');
+
+    // 2. Método SHOW: Acessível por estudantes e demais cargos
+    $this->middleware('roles:coordenador|professor|admin|estudante')
+         ->only(['show']);
+
+    // 3. RESTANTES MÉTODOS (index, create, store, edit, update, destroy, etc.)
+    // Bloqueia estudante e secretaria. Apenas professor, coordenador e admin entram.
+    $this->middleware('roles:coordenador|professor|admin')
+         ->except(['show']);
+}
+    public function show($id)
+    {
+        try{
+        // Carrega o professor com todas as relações necessárias mapeadas nos seus Models
+        $professor = Professor::with([
+            'user', 
+            'departamentos', 
+            'areas'
+        ])
+        ->withCount(['estudantes as orientacoes_ativas_count' => function ($query) {
+            $query->where('ativo', true);
+        }])
+        ->findOrFail($id);
+
+        return view('app.private.dashboard.othes.professores.show', compact('professor'));
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
+    public function toggleAcesso($id)
+{
+    try {
+        DB::beginTransaction();
+
+        // Encontra o professor ou falha
+        $professor = Professor::findOrFail($id);
+        $user = $professor->user;
+
+        // Inverte o estado booleano atual na tabela User
+        $novoEstado = !$user->acesso;
+        $user->acesso = $novoEstado;
+        
+        // Se aplicável no seu ecossistema, descomente o campo active padrão:
+        // $user->active = $novoEstado;
+
+        $user->save();
+
+        DB::commit();
+
+        $mensagem = $novoEstado ? 'Acesso do docente concedido com sucesso.' : 'Acesso do docente retirado com sucesso.';
+        return back()->with('success', $mensagem);
+
+    } catch (Exception $e) {
+        DB::rollBack();
+        Log::error('Erro ao alterar acesso do professor: ' . $e->getMessage());
+
+        return back()->with('error', 'Erro ao alterar acesso do professor: ' . $e->getMessage());
+    }
+}
      public function minhasCamapanhas()
 {
     try {
@@ -128,7 +191,7 @@ $user-> assignRole('professor');
 
             Log::error('Erro ao criar professor: '.$e->getMessage());
             
-            dd($e->getMessage());
+           // dd($e->getMessage());
             return back()
                 ->with('error','Erro ao criar professor : '.$e->getMessage())
                 ->withInput();

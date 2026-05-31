@@ -30,7 +30,7 @@
         </div>
         <div class="flex items-center gap-3">
             <div class="px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 text-right">
-                <span class="text-[10px] text-slate-400 font-black uppercase block tracking-widest">Status Geral</span>
+                <span class="text-[10px] text-slate-400 font-black uppercase block tracking-widest">Estado Geral</span>
                 @php
                     $statusColors = [
                         'aprovado' => 'text-emerald-600',
@@ -54,7 +54,7 @@
                 @else
                 
                 @if($campanha->prazo_melhorias)
-                <div class="alert">BUG</div>
+                 
                     @if($fase2==true)
                         @if($anteprojeto->status == 'melhorias')
                             <a href="{{ route('estudante.anteprojetos.nova_versao', $anteprojeto->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center">
@@ -112,7 +112,9 @@
     <tr class="bg-slate-50/50">
         <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Versão</th>
         <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Data de Envio</th>
-        <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th> 
+        <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+        <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Vista?</th> 
+
         <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Ações</th>
     </tr>
 </thead>
@@ -150,7 +152,18 @@
             {{ $v->status }}
         </span>
     </td>
-
+<td class="px-8 py-5">
+        @php
+            $vStatusColors = [
+                '1'  => 'bg-emerald-50 text-emerald-600',
+                '0' => 'bg-red-50 text-red-600',
+                    ];
+            $vStatusClass = $vStatusColors[$v->lida] ?? 'bg-slate-50 text-slate-600';
+        @endphp
+        <span class="text-[10px] font-black uppercase px-2 py-1 rounded-md {{ $vStatusClass }}">
+            {{ $v->lida?'Visto':'Não Visto' }}
+        </span>
+    </td>
     <td class="px-8 py-5">
         <div class="flex items-center justify-center gap-2">
             <button 
@@ -260,6 +273,11 @@
                                 <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-[10px]">
                                     <i class="fas fa-user-check"></i>
                                 </div>
+                                <a href="{{ route('professores.show', $decisao->coordenador->professor->id) }}" 
+           class="inline-flex items-center justify-center ml-1 text-slate-400 hover:text-blue-600 transition-colors" 
+           title="Ver Perfil do Professor">
+            <i class="fas fa-info-circle text-xs"></i>
+        </a>
                                 <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
                                     Prof. {{ $decisao->coordenador->professor->user->name }}
                                 </span>
@@ -385,7 +403,7 @@
          x-transition>
         
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden" @click.away="openEditTitleModal = false">
-            <form action="{{ route('estudante.anteprojetos.update_titulo', $anteprojeto->id) }}" method="POST">
+            <form action="{{ route('estudante.anteprojetos.update_titulo', $anteprojeto->id) }}" method="POST" onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
                 @csrf
                 @method('PATCH')
                 
@@ -434,7 +452,7 @@
                     Cancelar
                 </button>
                 
-                <form :action="deleteRoute" method="POST" class="flex-1">
+                <form :action="deleteRoute" method="POST" class="flex-1" onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="w-full px-4 py-4 bg-red-600 text-white text-[10px] font-black uppercase rounded-2xl hover:bg-red-700 shadow-lg shadow-red-200 transition">

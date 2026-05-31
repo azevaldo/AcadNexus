@@ -5,17 +5,25 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-6 py-10">
 
-    <!-- HEADER -->
-    <div class="mb-10">
-        <h1 class="text-3xl font-bold text-gray-800">
-            Editar Professor
-        </h1>
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div class="flex items-start gap-4">
+        {{-- Botão Voltar Minimalista --}}
+        <a href="{{ url()->previous()  }}"
+   class="mt-1 flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm shrink-0"
+   title="Voltar">
+    <i class="fas fa-arrow-left"></i>
+</a>
 
-        <p class="text-gray-500 mt-1">
-            Atualize os dados do professor e suas áreas de atuação
-        </p>
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 leading-tight">
+                Editar Professor
+            </h1>
+            <p class="text-gray-500 mt-1 text-sm">
+                Atualize os dados do professor e suas áreas de atuação
+            </p>
+        </div>
     </div>
-
+</div>
 
     <form method="POST"
           action="{{ route('professores.update',$professor) }}"
@@ -39,14 +47,22 @@
                         <label class="block text-sm font-semibold mb-2">
                             Nome
                         </label>
-
-                        <input type="text"
-                               name="name"
-                               value="{{ $professor->user->name }}"
-                               required
-                               class="w-full px-4 py-3 rounded-xl border
+ <input type="text"
+       name="nome"
+      value="{{ $professor->user->name }}"
+       required
+       minlength="3"
+       maxlength="100"
+       pattern="^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$"
+       title="O nome deve possuir entre 3 e 100 caracteres e conter apenas letras, números e espaços."
+       class="w-full px-4 py-3 rounded-xl border
                                       focus:ring-2 focus:ring-blue-500
                                       focus:border-blue-500">
+
+<p class="text-xs text-gray-500 mt-2">
+    Mínimo de 3 caracteres. Apenas letras, números e espaços.
+</p>
+                         
                     </div>
 
                     <div>

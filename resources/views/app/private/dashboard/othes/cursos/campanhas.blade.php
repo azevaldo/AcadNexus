@@ -27,7 +27,7 @@
 
     <div class="flex gap-3">
         @if(isset($curso))
-            <a href="{{ route('cursos.index') }}" 
+            <a href="{{ route('departamento.cursos', $curso->departamento_id) }}" 
                class="inline-flex items-center justify-center bg-slate-200 hover:bg-slate-300 text-slate-700 px-5 py-3 rounded-xl font-bold transition-all">
                 <i class="fas fa-arrow-left mr-2"></i> Voltar aos Cursos
             </a>
@@ -96,7 +96,7 @@
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 @hasanyrole('secretaria|admin|coordenador')
-                  <a href="{{ route('campanhas.edit', $campanha->id) }}" 
+                  <a href="{{ route('campanhas.edit', $campanha->id) }} " 
                                    class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -129,7 +129,7 @@
             Campanha: <span class="font-bold text-slate-800">{{ $campanha->titulo }}</span>
         </p>
 
-        <form method="POST" action="{{ route('campanhas.updatePrazos', $campanha->id) }}" class="space-y-5">
+        <form method="POST" action="{{ route('campanhas.updatePrazos', $campanha->id) }}" class="space-y-5" onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
             @csrf
             @method('PUT')
 

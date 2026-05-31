@@ -75,7 +75,7 @@ class AreaCientificaController extends Controller
             DB::rollBack();
 
             Log::error("Erro ao criar área científica: ".$e->getMessage());
-    dd($e->getMessage());
+    //dd($e->getMessage());
             return redirect()
                 ->route('areasCientificas.index')
                 ->with('error', 'Erro ao criar área científica'.$e->getMessage());

@@ -15,15 +15,21 @@ class ProfileAdminController extends Controller
      */
     public function edit()
     {
+        try{
         $user = Auth::user();
         return view('app.private.dashboard.othes.admin.perfil.perfil', compact('user'));
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 
     /**
      * Atualiza as informações básicas de identificação do administrador.
      */
     public function update(Request $request)
     {
+
+    try{
         $user = Auth::user();
 
         $request->validate([
@@ -31,7 +37,7 @@ class ProfileAdminController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
         ]);
 
-        try {
+       
             $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -48,12 +54,13 @@ class ProfileAdminController extends Controller
      */
     public function updatePassword(Request $request)
     {
+        try{
         $request->validate([
             'current_password' => ['required', 'current_password'],
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
-        try {
+        
             Auth::user()->update([
                 'password' => Hash::make($request->password),
             ]);

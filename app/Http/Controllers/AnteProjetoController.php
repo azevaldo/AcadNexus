@@ -17,6 +17,7 @@ class AnteprojetoController extends Controller
 {
     public function destroy_versao($id)
     {
+        try{
         $versao = AnteprojetoVersao::findOrFail($id);
         if($versao->lida){
   
@@ -41,16 +42,22 @@ class AnteprojetoController extends Controller
         $versao->delete();
 
         return back()->with('success', 'Versão eliminada com sucesso!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
     }
 // Exibe o formulário de NOVA VERSÃO (V2, V3...)
     public function novaVersao($id)
 {
+    try {
     // Carrega o anteprojeto com a campanha relacionada
     $anteprojeto = Anteprojeto::with('campanha')->findOrFail($id);
     $campanha = $anteprojeto->campanha;
     
     $hoje = Carbon::today();
-
+               if($campanha->status!="aberta"){
+                return redirect->back()->with('error','Esta campanha já não está aberta');
+               } 
     // 1. Verificar se a campanha tem uma data de prazo_melhorias definida
     if (!$campanha->prazo_melhorias) {
         return redirect()->back()->with('error', 'Esta campanha não possui prazo de melhorias definido.');
@@ -70,12 +77,16 @@ class AnteprojetoController extends Controller
 
     // Se passou por todas as validações, abre a view
     return view('app.private.dashboard.estudantes.anteprojetos.versao', compact('anteprojeto'));
-}
+} catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+    }
 
     public function updateTitulo(Request $request, $id)
     {
+        try{
         $request->validate([
-            'titulo' => 'required|string|max:255|min:5',
+            'titulo' => 'required|string|max:255|min:3',
         ]);
 
         $anteprojeto = Anteprojeto::findOrFail($id);
@@ -90,6 +101,9 @@ class AnteprojetoController extends Controller
         ]);
 
         return back()->with('success', 'Título atualizado com sucesso!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
     }
     // Armazena a nova versão
     public function storeVersao(Request $request, $id)
@@ -97,7 +111,7 @@ class AnteprojetoController extends Controller
          try {
         $request->validate([
             'descricao' => 'required|string|min:20',
-            'arquivo'   => 'required|mimes:pdf,docx|max:10240',
+            'arquivo'   => 'required|mimes:pdf,docx|max:256000',
         ]);
 
         $anteprojeto = Anteprojeto::findOrFail($id);
@@ -120,13 +134,13 @@ class AnteprojetoController extends Controller
 
             return redirect()->route('estudante.anteprojetos.show',$anteprojeto->id)
                              ->with('success', 'Nova versão submetida com sucesso!');
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-            return redirect()->back()->with('error', 'Erro ao processar submissão.');
+       } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
         }
     }
 public function show($id)
 {
+    try{
     // Carrega o anteprojeto com a relação da campanha para o cabeçalho
     $anteprojeto = Anteprojeto::with('campanha')->findOrFail($id);
     $campanha=$anteprojeto->campanha;
@@ -162,18 +176,23 @@ $estudante = Auth::user()->estudante;
 //dd($anteprojeto->decisoes);
 
     return view('app.private.dashboard.estudantes.anteprojetos.show', compact('totalVersoes','totalAnteprojetos','fase2','campanha','anteprojeto'));
-}
+} catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+    }
 public function meuAnteprojeto($campanha_id)
     {
+
+    try{
         
         // Busca a campanha para exibir detalhes no cabeçalho
         $campanha = Campanha::findOrFail($campanha_id);
 
         // Busca o estudante logado (ajuste conforme a sua relação no Model User)
        $estudante = Auth::user()->estudante;
-
+//dd("");
         // Lista os anteprojetos do estudante nesta campanha, do mais recente para o mais antigo
-        $anteprojetos = Anteprojeto::where('campanha_id',$campanha->id)->where('estudante_id',$estudante->id)->orderBy('created_at','desc') ->get();
+        $anteprojetos = Anteprojeto::where('campanha_id',$campanha->id)->where('estudante_id',$estudante->id)->orderBy('created_at','desc') ->paginate(10);
 //dd($anteprojetos->first()->status);
             $hoje=Carbon::today();
             $prazoSubmissao=Carbon::parse($campanha->prazo_submissao);
@@ -203,11 +222,17 @@ public function meuAnteprojeto($campanha_id)
     });
    // dd($fase1,$fase2);
         return view('app.private.dashboard.estudantes.anteprojetos.index', compact('totalAnteprojetos','totalVersoes','campanha', 'anteprojetos','fase1','fase2'));
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
     public function create($id)
     {
+        try  {
         $campanha = Campanha::findOrFail($id);
-                
+               if($campanha->status!="aberta"){
+                return redirect->back()->with('error','Esta campanha já não está aberta');
+               } 
         // Busca o estudante logado (ajuste conforme a sua relação no Model User)
        $estudante = Auth::user()->estudante;
 
@@ -257,7 +282,10 @@ public function meuAnteprojeto($campanha_id)
         return redirect()->back()->with('error', 'Você não tem permissão para realizar uma submissão no momento ou os prazos expiraram.');
     }
         return view('app.private.dashboard.estudantes.anteprojetos.create', compact('campanha'));
-    }
+   } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 
 
     public function store(Request $request)
@@ -267,8 +295,8 @@ public function meuAnteprojeto($campanha_id)
             $request->validate([
                 'campanha_id' => ['required','exists:campanhas,id'],
                 'descricao' => ['required','string'],
-                'arquivo' => ['required','file','mimes:pdf,doc,docx'],
-                'titulo' => ['required'],
+                'arquivo' => ['required','file','mimes:pdf,doc,docx','max:256000'],
+                'titulo' => 'required|string|max:255|min:3',
 
             ]);
 
@@ -326,13 +354,8 @@ public function meuAnteprojeto($campanha_id)
 
             return redirect()->route('estudante.anteprojetos.meuAnteprojeto',$request->campanha_id)->with('success','Anteprojeto enviado com sucesso!');
 
-        } catch (Exception $e) {
-
-            DB::rollBack();
-dd($e->getMessage());
-            Log::error('Erro ao submeter anteprojeto: '.$e->getMessage());
-
-            return back()->with('error','Erro ao submeter.');
+       } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
         }
     }
 }

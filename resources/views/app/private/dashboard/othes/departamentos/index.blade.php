@@ -47,32 +47,47 @@
                         {{ $departamento->nome }}
                     </td>
 
-                   <td class="px-8 py-5 text-right space-x-4">
-    <a href="{{ route('departamento.cursos', $departamento->id) }}" 
-   class="text-amber-600 hover:text-amber-800 transition" 
-   title="Cursos">
-   <i class="fas fa-graduation-cap"></i>
-</a>
-                   <a href="{{ route('departamentos.professores', $departamento->id) }}" 
-       class="text-amber-600 hover:text-amber-800 transition" 
-       title="Listar Professores deste Departamento">
-        👥
-    </a>
-                         @hasanyrole('secretaria|admin')
-            <!-- EDIT -->
-             <a href="" onclick="openModal('editModal{{ $departamento->id }}')"
-                            class="text-blue-600 hover:text-blue-800 transition" title="Editar">✏️</a>
-   
+     <td class="px-8 py-5 text-right">
 
-                       <a href="" onclick="openModal('deleteModal{{ $departamento->id }}')"
-                            class="text-red-600 hover:text-red-800 transition" title="Eliminar">🗑️</a>
-                        <!-- DELETE -->
- 
-            
-                         @endhasanyrole
-                        
-                       
-                    </td>
+    <div class="flex justify-end items-center gap-3">
+
+        <!-- CURSOS -->
+        <a href="{{ route('departamento.cursos', $departamento->id) }}"
+           class="text-gray-500 hover:text-amber-600 transition"
+           title="Cursos">
+            <i class="fas fa-graduation-cap"></i>
+        </a>
+
+        <!-- PROFESSORES -->
+        <a href="{{ route('departamentos.professores', $departamento->id) }}"
+           class="text-gray-500 hover:text-indigo-600 transition"
+           title="Professores">
+            <i class="fas fa-chalkboard-teacher"></i>
+        </a>
+
+        @hasanyrole('secretaria|admin')
+
+        <!-- EDITAR -->
+        <button type="button"
+                onclick="openModal('editModal{{ $departamento->id }}')"
+                class="text-gray-500 hover:text-blue-600 transition"
+                title="Editar">
+            <i class="fas fa-pen-to-square"></i>
+        </button>
+
+        <!-- ELIMINAR -->
+        <button type="button"
+                onclick="openModal('deleteModal{{ $departamento->id }}')"
+                class="text-gray-500 hover:text-red-600 transition"
+                title="Eliminar">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+
+        @endhasanyrole
+
+    </div>
+
+</td>        
                 </tr>
 
                 <!-- MODAL EDIT -->
@@ -182,7 +197,7 @@
                 Novo Departamento
             </h2>
 
-            <form method="POST" action="{{ route('departamentos.store') }}">
+            <form method="POST" action="{{ route('departamentos.store') }}" onsubmit="let btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.innerText='A guardar...'; btn.classList.add('opacity-50', 'cursor-not-allowed');">
                 @csrf
 
                 <label class="block text-sm font-semibold mb-2 text-gray-600">
@@ -194,7 +209,8 @@
                        required
                        class="w-full px-4 py-3 rounded-xl border
                               focus:ring-2 focus:ring-blue-500
-                              focus:outline-none">
+                              focus:outline-none"  minlength="5"
+                            maxlength="255">
 
                 <div class="flex justify-end gap-3 mt-6">
                     <button type="button"

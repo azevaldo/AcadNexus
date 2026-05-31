@@ -15,6 +15,7 @@ class IaController extends Controller
 {
 public function index()
 {
+    try{
     if (!Auth::user()->estudante) {
         return redirect()->back()
             ->with('error', 'Apenas estudantes podem aceder a esta funcionalidade.');
@@ -37,6 +38,9 @@ public function index()
         'app.private.dashboard.estudantes.ia.index',
         compact('favoritos', 'sugestoes')
     );
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
 }
 
 public function gerar(Request $request)
@@ -131,7 +135,7 @@ public function gerar(Request $request)
         */
 
         $apiKey = env('GROQ_API_KEY');
-
+//dd($apiKey);
         if (!$apiKey) {
 
             return back()
@@ -956,20 +960,28 @@ public function gerar(Request $request)
 
     public function favoritar($id)
     {
+        try{
         FavoritoTemaIa::firstOrCreate([
             'estudante_id' => Auth::user()->estudante->id,
             'sugestao_id'  => $id
         ]);
 
         return back()->with('success', 'Tema guardado nos favoritos!');
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 
     public function removerFavorito($id)
     {
+        try{
         FavoritoTemaIa::where('estudante_id', Auth::user()->estudante->id)
             ->where('id', $id)
             ->delete();
 
         return back()->with('info', 'Removido dos favoritos.');
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 }

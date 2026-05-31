@@ -13,9 +13,10 @@ class TutorController extends Controller
      
     public function index()
     {
+        try{
         // Recupera o tutor através do usuário logado (User -> Professor -> Tutor)
      /*   
-
+try{
         if (!$tutor) {
             return redirect()->route('dashboard')->with('error', 'Acesso restrito a orientadores.');
         }
@@ -25,8 +26,11 @@ class TutorController extends Controller
         $orientandos = EstudanteTutor::with(['estudante.user', 'estudante.curso', 'tutor.user', 'coTutor.user'])
             ->where('tutor_id', $tutor->id)
             ->orWhere('co_tutor_id', $tutor->id)
-            ->get();
+            ->paginate(2);
 
         return view('app.private.dashboard.othes.tutores.estudantes', compact('orientandos', 'tutor'));
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 }

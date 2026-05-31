@@ -17,6 +17,7 @@ class ProfileProfessorController extends Controller
      */
     public function edit()
     {
+        try{
         $user = Auth::user();
         
         // Eager Loading das relações do professor e contagens estatísticas das orientações
@@ -33,25 +34,34 @@ class ProfileProfessorController extends Controller
         $todasAreas = AreaCientifica::orderBy('nome', 'asc')->get();
 
         return view('app.private.dashboard.othes.professores.perfil.perfil', compact('user', 'professor', 'todasAreas'));
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 
     /**
      * Atualiza os dados pessoais, limite de orientações e as áreas científicas do professor.
      */
     public function update(Request $request)
     {
+        try{
         $user = Auth::user();
         $professor = $user->professor;
 
         $request->validate([
-            'name' => ['required', 'string', 'max:100', 'regex:/^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$/'],
+               'name' => [
+    'required',
+    'string',
+    'min:3',
+    'max:100',
+    'regex:/^[\p{L}\s]+$/u'
+],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'max_orientacoes' => ['required', 'integer', 'min:1', 'max:50'], // Validação do novo campo institucional
             'areas' => ['nullable', 'array'],
             'areas.*' => ['exists:areas_cientificas,id'], 
         ]);
-
-        try {
+ 
             DB::transaction(function () use ($request, $user, $professor) {
                 // 1. Atualiza dados de utilizador base
                 $user->update([
@@ -79,12 +89,13 @@ class ProfileProfessorController extends Controller
      */
     public function updatePassword(Request $request)
     {
+        try{
         $request->validate([
             'current_password' => ['required', 'current_password'],
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
-        try {
+        
             Auth::user()->update([
                 'password' => Hash::make($request->password),
             ]);

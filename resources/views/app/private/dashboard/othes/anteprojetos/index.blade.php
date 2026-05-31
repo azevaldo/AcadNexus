@@ -6,55 +6,67 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
-    {{-- HEADER E ESTATÍSTICAS --}}
-    <div class="mb-10">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div>
-                <div class="flex items-center gap-4 mb-2">
-                    <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                        <i class="fas fa-folder-tree text-xl"></i>
-                    </div>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Painel de Anteprojetos Recebidos</h1>
+ {{-- HEADER E ESTATÍSTICAS --}}
+<div class="mb-10">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div>
+            <div class="flex items-center gap-4 mb-2">
+                {{-- Botão Voltar Premium --}}
+                <a href="{{ route('campanhas.show', $campanha->id) }}" 
+                   class="flex items-center justify-center w-12 h-12 rounded-2xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm shrink-0"
+                   title="Voltar">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+
+                {{-- Ícone da Tela --}}
+                <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200 shrink-0">
+                    <i class="fas fa-folder-tree text-xl"></i>
                 </div>
-                <p class="text-slate-500 font-medium flex items-center gap-2">
-                    <span class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
-                    Monitorando: <span class="text-slate-800 font-bold">{{ $campanha->titulo }}</span>
-                </p>
+                
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    Painel de Anteprojetos Recebidos
+                </h1>
+            </div>
+            
+            <p class="text-slate-500 font-medium flex items-center gap-2 pl-16">
+                <span class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
+                Monitorando: <span class="text-slate-800 font-bold">{{ $campanha->titulo }}</span>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full lg:w-auto">
+            {{-- Card Entregas --}}
+            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                <span class="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-1">Total Entregas</span>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-2xl font-black text-slate-900">{{ $campanha->anteprojetos_count }}</span>
+                    <span class="text-xs font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Projetos</span>
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full lg:w-auto">
-                {{-- Card Entregas --}}
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
-                    <span class="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-1">Total Entregas</span>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-2xl font-black text-slate-900">{{ $campanha->anteprojetos_count }}</span>
-                        <span class="text-xs font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">Projetos</span>
-                    </div>
-                </div>
+            {{-- Card Prazo --}}
+            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                <span class="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-1">Data Limite</span>
+                <span class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <i class="far fa-calendar-alt text-blue-500"></i>
+                    {{ \Carbon\Carbon::parse($campanha->prazo_submissao)->format('d/m/Y') }}
+                </span>
+            </div>
 
-                {{-- Card Prazo --}}
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
-                    <span class="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-1">Data Limite</span>
-                    <span class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                        <i class="far fa-calendar-alt text-blue-500"></i>
-                        {{ \Carbon\Carbon::parse($campanha->prazo_submissao)->format('d/m/Y') }}
-                    </span>
-                </div>
-
-                {{-- Status do Prazo --}}
-                @php
-                    $diasRestantes = \Carbon\Carbon::now()->diffInDays($campanha->prazo_submissao, false);
-                    $isExpired = $diasRestantes < 0;
-                @endphp
-                <div class="{{ $isExpired ? 'bg-red-50 border-red-100' : 'bg-emerald-50 border-emerald-100' }} p-4 rounded-2xl border flex flex-col justify-center col-span-2 md:col-span-1 text-center md:text-left">
-                    <span class="text-[10px] uppercase font-black {{ $isExpired ? 'text-red-400' : 'text-emerald-500' }} tracking-widest">Status da Campanha</span>
-                    <span class="text-xs font-black {{ $isExpired ? 'text-red-700' : 'text-emerald-700' }}">
-                        {{ $isExpired ? 'SUBMISSÕES ENCERRADAS' : 'RECEBENDO PROJETOS' }}
-                    </span>
-                </div>
+            {{-- Status do Prazo --}}
+            @php
+                $diasRestantes = \Carbon\Carbon::now()->diffInDays($campanha->prazo_submissao, false);
+                $isExpired = $diasRestantes < 0;
+            @endphp
+            <div class="{{ $isExpired ? 'bg-red-50 border-red-100' : 'bg-emerald-50 border-emerald-100' }} p-4 rounded-2xl border flex flex-col justify-center col-span-2 md:col-span-1 text-center md:text-left">
+                <span class="text-[10px] uppercase font-black {{ $isExpired ? 'text-red-400' : 'text-emerald-500' }} tracking-widest">Estado da Campanha</span>
+                <span class="text-xs font-black {{ $isExpired ? 'text-red-700' : 'text-emerald-700' }}">
+                    {{ $isExpired ? 'SUBMISSÕES ENCERRADAS' : 'RECEBENDO PROJETOS' }}
+                </span>
             </div>
         </div>
     </div>
+</div>
 
     {{-- LISTAGEM --}}
     <div class="bg-white rounded-[2rem] shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
@@ -168,6 +180,11 @@
                 </tbody>
             </table>
         </div>
+        @if($anteprojetos->hasPages())
+        <div class="px-6 py-5 bg-slate-50/50 border-t border-slate-100">
+            {{ $anteprojetos->links() }}
+        </div>
+        @endif
         {{-- Rodapé --}}
         <div class="bg-slate-50/80 px-8 py-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
             <span>Exibindo {{ $anteprojetos->count() }} Anteprojetos Recebidos</span>

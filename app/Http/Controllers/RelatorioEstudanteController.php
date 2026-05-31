@@ -14,6 +14,7 @@ class RelatorioEstudanteController extends Controller
 {
    public function index()
 {
+    try{
     $user = Auth::user();
     // Eager loading para performance
     $estudante = Estudante::with(['curso', 'anteprojetos', 'tutorRelacao.tutor.user', 'campanhas'])
@@ -29,12 +30,16 @@ class RelatorioEstudanteController extends Controller
     ];
 
     return view('app.private.dashboard.estudantes.relatorios.index', compact('estudante', 'stats'));
-}
+} catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+    }
 
          
 
     public function exportarPdf()
     {
+        try{
         $estudante = Auth::user()->estudante;
         $temas = SugestaoTemaIa::where('estudante_id', $estudante->id)->with('area')->get();
 
@@ -43,5 +48,8 @@ class RelatorioEstudanteController extends Controller
         // return $pdf->download('meus-temas-tcc.pdf');
         
         return back()->with('info', 'Funcionalidade de PDF requer instalação do DomPDF.');
-    }
+    } catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+        }
 }

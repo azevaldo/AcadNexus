@@ -9,7 +9,7 @@ class SubmissaoFase extends Model
     protected $table = 'submissao_fase';
 
     protected $fillable = [
-        'fase_tcc_id','descricao_estudante','arquivo'
+        'fase_tcc_id','descricao_estudante','arquivo','visto'
     ];
 
 public function fase()

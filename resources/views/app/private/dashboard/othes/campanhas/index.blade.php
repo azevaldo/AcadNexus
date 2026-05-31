@@ -64,11 +64,17 @@
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
                                     Ativa
                                 </span>
-                            @else
+                            @elseif($campanha->status == 'encerrada')
                                 <span class="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-bold uppercase tracking-tight">
                                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>
                                     Encerrada
                                 </span>
+                                @else
+                                <span class="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold uppercase tracking-tight border border-red-100">
+    <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-2"></span>
+    Cancelada
+</span>
+                                
                             @endif
                         </td>
 
@@ -88,10 +94,7 @@
         title="Ajustar Prazos">
     <i class="fas fa-calendar-alt"></i>
 </button>
-                                <button onclick="openModal('deleteModal{{ $campanha->id }}')" 
-                                        class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Eliminar">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                
                                 @endhasanyrole
                            
                             </div>

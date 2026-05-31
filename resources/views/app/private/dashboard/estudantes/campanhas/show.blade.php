@@ -6,26 +6,35 @@
 
 <div class="max-w-7xl mx-auto px-6 py-10 lg:px-10">
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+<div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+    {{-- Bloco do Título + Botão Voltar --}}
+    <div class="flex items-start gap-4">
+        {{-- Botão Voltar Premium --}}
+        <a href="{{ route('estudante.campanhaestudante.index') }}" 
+           class="mt-1 flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm shrink-0"
+           title="Voltar para Campanhas">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
         <div>
-            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
                 {{ $campanha->titulo }}
             </h1>
-            <p class="text-slate-500 mt-2 flex items-center">
-                <span class="w-8 h-px bg-slate-300 mr-3"></span>
+            <p class="text-slate-500 mt-2 flex items-center text-sm">
+                <span class="w-6 h-px bg-slate-300 mr-3"></span>
                 Painel Geral de Informações
             </p>
         </div>
-
-        <div class="flex gap-3">
-            <a href="{{ route('estudante.anteprojetos.meuAnteprojeto', $campanha->id) }}"
-               class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-6 py-3 rounded-xl font-bold transition shadow-sm border border-indigo-100">
-                <i class="fas fa-users mr-2"></i> Ver Anteprojetos
-            </a>
-
-             
-        </div>
     </div>
+
+    {{-- Bloco de Ações (Direita) --}}
+    <div class="flex items-center w-full lg:w-auto">
+        <a href="{{ route('estudante.anteprojetos.meuAnteprojeto', $campanha->id) }}"
+           class="w-full sm:w-auto text-center bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-6 py-3 rounded-xl font-bold transition shadow-sm border border-indigo-100 text-sm flex items-center justify-center gap-2">
+            <i class="fas fa-file-alt"></i> Ver Anteprojetos
+        </a>
+    </div>
+</div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         

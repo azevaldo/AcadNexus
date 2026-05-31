@@ -15,6 +15,7 @@ class AnteprojetoAdminController extends Controller
     //
     public function index($campanha_id)
     {
+        try{
         $campanha = Campanha::withCount('anteprojetos')->findOrFail($campanha_id);
     
     // Pegamos todos os anteprojetos da campanha e carregamos apenas a última versão de cada
@@ -22,14 +23,17 @@ class AnteprojetoAdminController extends Controller
         ->with(['estudante.user', 'versoes' => function($q) {
             $q->latest();
         }])
-        ->get();
+        ->paginate(10);
 
     return view('app.private.dashboard.othes.anteprojetos.index', compact('campanha', 'anteprojetos'));
-
+} catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
        // return view('app.private.dashboard.othes.anteprojetos.index', compact('campanha', 'anteprojetos'));
     }
 public function historicoAnteprojeto($id)
 {
+    try{
     $anteprojeto = Anteprojeto::with([
         'estudante.user',
         'versoes.decisao.coordenador.professor.user' // Carrega a decisão de cada versão
@@ -42,9 +46,13 @@ $ultima->save();
     }
   
     return view('app.private.dashboard.othes.anteprojetos.historico', compact('itensMelhoria','anteprojeto'));
-}
+} catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+    }
     public function show($id)
 {
+    try{
     // Carrega o anteprojeto com a relação da campanha para o cabeçalho
     $anteprojeto = Anteprojeto::with('campanha')->findOrFail($id);
   
@@ -52,10 +60,14 @@ $ultima->save();
     // if (Auth::user()->estudante->id !== $anteprojeto->estudante_id) { abort(403); }
 
     return view('app.private.dashboard.othes.anteprojetos.show', compact('anteprojeto'));
-}
+} catch (\Exception $e) {
+            return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
+        }
+    }
 
 // Método para salvar a avaliação
 public function storeAvaliacao(Request $request, $id) {
+    try{
     $request->validate([
         'anteprojeto_versao_id' => 'required|exists:anteprojeto_versoes,id',
         'decisao' => 'required|in:aprovado,melhorias,rejeitado',
@@ -63,7 +75,7 @@ public function storeAvaliacao(Request $request, $id) {
         'melhorias' => 'nullable|array', // Array de IDs dos itens selecionados
     ]);
 
-    try {
+ 
         DB::beginTransaction();
 $anteprojeto = Anteprojeto::findOrFail($id);
 $coordenador=$anteprojeto->campanha->curso->departamento->coordenador;

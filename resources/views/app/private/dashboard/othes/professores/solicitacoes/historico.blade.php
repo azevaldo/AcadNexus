@@ -16,7 +16,7 @@
                 </div>
                 <div>
                     <h3 class="font-black text-gray-900 uppercase">{{ $s->estudante->user->name }}</h3>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">Curso: {{ $s->estudante->curso ?? 'N/A' }} | Solicitado em: {{ $s->created_at->format('d/m/Y') }}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">Curso: {{ $s->estudante->curso->nome ?? 'N/A' }} | Solicitado em: {{ $s->created_at->format('d/m/Y') }}</p>
                     <div class="mt-1">
                         <span class="text-[9px] font-black uppercase px-2 py-0.5 border border-gray-900 bg-blue-50 text-blue-600">
                             Pretende: {{ $s->tipo == 'tutor' ? 'Orientador Principal' : 'Co-Orientador' }}
@@ -26,6 +26,9 @@
             </div>
 
             <div class="flex gap-3">
+                   <a href="{{route('estudantes.show',$s->estudante->id)}}" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 border-2 border-gray-900 font-black uppercase text-xs shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 active:shadow-none">
+                        Info
+                    </a>
                 @if($s->status == 'pendente')
                 <form action="{{ route('solicitacoes.responder', $s->id) }}" method="POST">
                     @csrf
@@ -53,5 +56,10 @@
         </div>
         @endforelse
     </div>
+     @if($solicitacoes->hasPages())
+        <div class="px-6 py-5 bg-slate-50/50 border-t border-slate-100">
+            {{ $solicitacoes->links() }}
+        </div>
+        @endif
 </div>
 @endsection
