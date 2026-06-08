@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'acesso',
+        'telefone',
     ];
 
     /**
@@ -53,4 +54,57 @@ class User extends Authenticatable
     {
         return $this->hasOne(Estudante::class);
     }
+    // Dentro de App\Models\User.php
+
+public function ehCoordenadorDoCurso($cursoId)
+{
+    // Busca o perfil do professor ligado a este usuário
+    $professor = \App\Models\Professor::where('user_id', $this->id)->first();
+    
+    if (!$professor) {
+        return false;
+    }
+
+    // Busca o curso para saber o departamento
+    $curso = \App\Models\Curso::find($cursoId);
+    
+    if (!$curso) {
+        return false;
+    }
+
+    // Checa se é o coordenador ativo do departamento do curso
+    return \App\Models\Coordenador::where('professor_id', $professor->id)
+        ->where('departamento_id', $curso->departamento_id)
+        ->where('ativo', true)
+        ->exists();
+}
+
+public function ehCoordenadorDoDepartamento($depaId)
+{
+    // Busca o perfil do professor ligado a este usuário
+    $professor = \App\Models\Professor::where('user_id', $this->id)->first();
+    
+    if (!$professor) {
+        return false;
+    }
+
+    // Busca o curso para saber o departamento
+    $departamento = \App\Models\Departamento::find($depaId);
+    
+    if (!$departamento) {
+        return false;
+    }
+
+    // Checa se é o coordenador ativo do departamento do curso
+    return \App\Models\Coordenador::where('professor_id', $professor->id)
+        ->where('departamento_id', $departamento->id)
+        ->where('ativo', true)
+        ->exists();
+}
+
+public function routeNotificationForTwilio()
+    {
+        return $this->telefone; // Ou o nome da coluna de telefone no seu banco
+    }
+
 }

@@ -193,7 +193,11 @@
                                    title="Ver Detalhes do Perfil">
                                     <i class="fas fa-info-circle text-xs"></i>
                                 </a>
+                                @hasanyrole('admin|coordenador')
 
+
+
+                                @role('admin')
                                 <a href="{{ route('estudantes.edit', $estudante->id) }}"
                                    class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition" title="Editar">
                                     <i class="fas fa-edit text-xs"></i>
@@ -210,6 +214,28 @@
                                         <i class="fas fa-user-check text-xs"></i>
                                     </button>
                                 @endif
+                                @endrole
+
+                                           @if(auth()->user()->ehCoordenadorDoCurso($estudante->curso_id))
+                                <a href="{{ route('estudantes.edit', $estudante->id) }}"
+                                   class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition" title="Editar">
+                                    <i class="fas fa-edit text-xs"></i>
+                                </a>
+
+                                @if($estudante->user->acesso)
+                                    <button onclick="openModal('accessModal{{ $estudante->id }}')"
+                                        class="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition" title="Retirar Acesso">
+                                        <i class="fas fa-user-slash text-xs"></i>
+                                    </button>
+                                @else
+                                    <button onclick="openModal('accessModal{{ $estudante->id }}')"
+                                        class="p-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition" title="Conceder Acesso">
+                                        <i class="fas fa-user-check text-xs"></i>
+                                    </button>
+                                @endif
+
+                                           @endif
+                                @endhasanyrole
                             </div>
                         </td>
                     </tr>
@@ -283,7 +309,7 @@
                     <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Ano de Frequência</label>
                     <select name="ano" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
                         <option value="">Todos os Anos</option>
-                        @for ($i = 1; $i <= 5; $i++)
+                        @for ($i = 4; $i <= 5; $i++)
                             <option value="{{ $i }}" {{ request('ano') == $i ? 'selected' : '' }}>{{ $i }}º Ano</option>
                         @endfor
                     </select>

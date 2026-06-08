@@ -47,7 +47,7 @@
             <div class="bg-white border rounded-2xl p-5 shadow-sm flex items-center justify-between">
                 <div>
                     <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wide">Conta no Sistema</h4>
-                    <p class="text-[11px] text-gray-400 mt-0.5">Status de login do usuário</p>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Estado de acesso do usuário</p>
                 </div>
                 <div>
                     @if($professor->user->acesso)
@@ -80,7 +80,10 @@
                         <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest">E-mail Institucional</label>
                         <p class="text-sm font-bold text-gray-700 mt-1 bg-gray-50 border rounded-xl px-4 py-2.5 break-all">{{ $professor->user->email }}</p>
                     </div>
-
+                     <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Telefone</label>
+                        <p class="text-sm font-bold text-gray-700 mt-1 bg-gray-50 border rounded-xl px-4 py-2.5">{{ $professor->user->telefone }}</p>
+                    </div>
                     <div class="sm:col-span-2">
                         <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Departamentos Vinculados</label>
                         <div class="flex flex-wrap gap-2 mt-1.5">
@@ -106,15 +109,26 @@
                     @if($professor->areas->count() > 0)
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach($professor->areas as $area)
-                                <div class="p-4 bg-blue-50/40 border border-blue-100 rounded-xl flex items-start gap-3">
-                                    <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                        <i class="fas fa-microscope text-xs"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-gray-700 leading-tight">{{ $area->nome }}</p>
-                                        <p class="text-[11px] text-gray-400 mt-1 leading-relaxed">{{ $area->descricao ?? 'Sem descrição da linha de pesquisa.' }}</p>
-                                    </div>
-                                </div>
+                                <div class="p-4 bg-blue-50/40 border border-blue-100 rounded-xl flex items-start gap-3 w-full">
+    {{-- ÍCONE --}}
+    <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0">
+        <i class="fas fa-microscope text-xs"></i>
+    </div>
+    
+    {{-- TEXTOS --}}
+    <div class="min-w-0 flex-1">
+        {{-- Nome da Área (com truncate caso o nome também seja gigante) --}}
+        <p class="text-sm font-bold text-gray-700 leading-tight truncate">
+            {{ $area->nome }}
+        </p>
+        
+        {{-- Descrição Adaptável e Limitada --}}
+        <p class="text-[11px] text-gray-400 mt-1 leading-relaxed break-words line-clamp-2" 
+           title="{{ $area->descricao }}">
+            {{ $area->descricao ?? 'Sem descrição da linha de pesquisa.' }}
+        </p>
+    </div>
+</div>
                             @endforeach
                         </div>
                     @else

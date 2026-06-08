@@ -15,13 +15,7 @@
                 Gerencie os períodos de submissão de anteprojetos por curso.
             </p>
         </div>
- @hasanyrole('coordenador|secretaria|admin')
-        <a href="{{ route('campanhas.create') }}"
-           class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5 active:scale-95">
-            <i class="fas fa-plus-circle mr-2"></i>
-            Nova Campanha
-        </a>
-        @endhasanyrole
+ 
     </div>
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
@@ -85,7 +79,8 @@
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 @hasanyrole('admin|coordenador')
-                  <a href="{{ route('campanhas.edit', $campanha->id) }}" 
+                 @role('admin')
+                                <a href="{{ route('campanhas.edit', $campanha->id) }}" 
                                    class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -94,6 +89,19 @@
         title="Ajustar Prazos">
     <i class="fas fa-calendar-alt"></i>
 </button>
+@endrole
+
+                                            @if(auth()->user()->ehCoordenadorDoCurso($campanha->curso_id))
+ <a href="{{ route('campanhas.edit', $campanha->id) }}" 
+                                   class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button onclick="openModal('prazosModal{{ $campanha->id }}')" 
+        class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" 
+        title="Ajustar Prazos">
+    <i class="fas fa-calendar-alt"></i>
+</button>
+                                            @endif
                                 
                                 @endhasanyrole
                            
@@ -127,7 +135,7 @@
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Prazo de Melhorias</label>
                 <input type="date" name="prazo_melhorias" value="{{ $campanha->prazo_melhorias }}"
-                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+                   min="{{ date('Y-m-d', strtotime('+1 day')) }}"    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
             </div>
 
             <div class="flex gap-3 pt-4">

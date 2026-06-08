@@ -269,10 +269,21 @@
             </div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Aguardando Avaliação</p>
             @hasanyrole('coordenador|admin')
+
+            @role('admin')
             <button @click="openFeedbackModal = true; versaoId = '{{ $v->id }}'; statusSelecionado = ''" 
                     class="w-full bg-slate-900 text-white py-3 rounded-xl text-[10px] font-black uppercase hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">
                 Avaliar Versão {{ $v->numero_versao }}
             </button>
+
+            @endrole
+              @if(auth()->user()->ehCoordenadorDoCurso($anteprojeto->campanha->curso->id))
+            <button @click="openFeedbackModal = true; versaoId = '{{ $v->id }}'; statusSelecionado = ''" 
+                    class="w-full bg-slate-900 text-white py-3 rounded-xl text-[10px] font-black uppercase hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">
+                Avaliar Versão {{ $v->numero_versao }}
+            </button>
+
+              @endif
             @endhasanyrole      
         </div>
     @endif

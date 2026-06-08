@@ -42,6 +42,7 @@ class CoordenadorRelatorioController extends Controller
 
         // 3. Listagem de Campanhas Ativas
         $campanhasAtivas = Campanha::withCount(['anteprojetos', 'estudantes'])
+        ->where('status','aberta')
             ->whereIn('curso_id', $cursosIds)
             ->orderBy('created_at', 'desc')
             ->take(5)
@@ -54,6 +55,7 @@ class CoordenadorRelatorioController extends Controller
             })
             ->withCount(['orientacoes as total_orientandos']) 
             ->get();
+           // dd($professores);
 
         return view('app.private.dashboard.othes.coordenadores.relatorios.index', compact(
             'coordenador', 

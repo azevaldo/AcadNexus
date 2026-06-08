@@ -142,22 +142,7 @@
                     </div>
                 </div>
 
-                {{-- Gestão Admin (Visível apenas para Coordenadores) --}}
-                @if(Auth::user()->hasRole('coordenador'))
-                <div class="bg-gray-900 text-white p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden">
-                    <div class="relative z-10">
-                        <h4 class="font-black text-xl mb-4 uppercase tracking-tighter italic">Gestão Admin</h4>
-                        <div class="space-y-3">
-                            <button class="w-full bg-indigo-600 hover:bg-indigo-500 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition">
-                                <i class="fas fa-plus-circle mr-2"></i> Criar Campanha
-                            </button>
-                            <button class="w-full bg-white/10 hover:bg-white/20 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/5 transition">
-                                <i class="fas fa-users mr-2"></i> Membros
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                @endif
+ 
 
                 {{-- Campanhas Ativas --}}
                 <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">

@@ -47,7 +47,7 @@
             <div class="bg-white border rounded-2xl p-5 shadow-sm flex items-center justify-between">
                 <div>
                     <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wide">Conta no Sistema</h4>
-                    <p class="text-[11px] text-gray-400 mt-0.5">Status de login do usuário</p>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Estado do acesso do usuário</p>
                 </div>
                 <div>
                     @if($estudante->user->acesso)
@@ -85,11 +85,21 @@
                         <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Número de BI</label>
                         <p class="text-sm font-bold text-gray-700 mt-1 bg-gray-50 border rounded-xl px-4 py-2.5">{{ $estudante->bi }}</p>
                     </div>
+                     <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Telefone</label>
+                        <p class="text-sm font-bold text-gray-700 mt-1 bg-gray-50 border rounded-xl px-4 py-2.5">{{ $estudante->user->telefone }}</p>
+                    </div>
 
                     <div>
                         <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Curso Matriculado</label>
                         <p class="text-sm font-bold text-indigo-600 mt-1 bg-indigo-50/30 border border-indigo-100 rounded-xl px-4 py-2.5">
                             {{ $estudante->curso->nome ?? 'Curso não identificado' }}
+                        </p>
+                    </div>
+                                        <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Departamento</label>
+                        <p class="text-sm font-bold text-indigo-600 mt-1 bg-indigo-50/30 border border-indigo-100 rounded-xl px-4 py-2.5">
+                            {{ $estudante->curso->departamento->nome ?? 'Departamento não identificado' }}
                         </p>
                     </div>
                 </div>

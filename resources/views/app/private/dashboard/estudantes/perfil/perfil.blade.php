@@ -120,11 +120,16 @@
                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none font-medium text-sm transition-all">
                             @error('bi') <p class="text-rose-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                         </div>
-
+ <div>
+                            <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Telefone</label>
+                            <input type="text" name="telefone" value="{{ old('telefone', $user->telefone) }}" required 
+                                   class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none font-bold text-sm transition-all">
+                            @error('telefone') <p class="text-rose-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        </div>
                         {{-- Ano de Frequência (Tabela: estudantes) --}}
                         <div>
                             <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Ano de Frequência</label>
-                            <input type="number" name="ano_frequencia" value="{{ old('ano_frequencia', $estudante->ano_frequencia) }}" required min="1" max="6"
+                            <input type="number" name="ano_frequencia" value="{{ old('ano_frequencia', $estudante->ano_frequencia) }}" required min="4" max="6"
                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none font-bold text-sm transition-all">
                             @error('ano_frequencia') <p class="text-rose-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                         </div>
@@ -138,13 +143,17 @@
                             </select>
                             @error('regime') <p class="text-rose-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
                         </div>
-
+<input type="text" name="curso_id" value="{{$estudante->curso->id}}" hidden>
                         {{-- Nº de Matrícula (Bloqueado para alteração - Segurança) --}}
-                        <div>
-                            <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Nº de Matrícula (Protegido)</label>
-                            <input type="text" value="{{ $estudante->numero_matricula }}" disabled
-                                   class="w-full bg-gray-100 border border-gray-200 text-gray-400 font-bold rounded-xl px-4 py-3 outline-none text-sm cursor-not-allowed">
-                        </div>
+                        {{-- Nº de Matrícula (Bloqueado para alteração - Segurança) --}}
+<div>
+    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Nº de Matrícula (Protegido)</label>
+    <input type="text" 
+           name="numero_matricula" 
+           value="{{ $estudante->numero_matricula }}" 
+           readonly
+           class="w-full bg-gray-100 border border-gray-200 text-gray-400 font-bold rounded-xl px-4 py-3 outline-none text-sm cursor-not-allowed">
+</div>
                     </div>
 
                     <div class="flex justify-end border-t border-gray-100 pt-6">

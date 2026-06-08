@@ -68,7 +68,7 @@
             <div class="lg:col-span-4 space-y-6">
                 <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100">
                     <h4 class="text-xs font-black uppercase text-gray-800 mb-6 flex items-center">
-                        <i class="fas fa-building mr-2 text-indigo-600"></i> Lotação Acadêmica
+                        <i class="fas fa-building mr-2 text-indigo-600"></i> Informações Acadêmicas
                     </h4>
                     <div class="space-y-4">
                         @foreach($professor->departamentos as $dep)
@@ -97,6 +97,10 @@
                     <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                         <h3 class="font-black uppercase tracking-widest text-xs text-gray-800">Lista de Orientandos (Tutor Principal)</h3>
                         <span class="text-[10px] font-black text-indigo-600">{{ $professor->estudantes->count() }} Alunos</span>
+                        
+                        <a href="{{ route('tutor.estudantes.index') }}" class="text-[9px] font-black uppercase tracking-tight text-indigo-600 hover:text-indigo-800 transition-colors">
+                            Ver Todas →
+                        </a>
                     </div>
                     
                     <div class="overflow-x-auto">
@@ -126,9 +130,9 @@
                                             <span class="text-xs font-bold text-gray-600">{{ $orientado->estudante->curso->nome ?? 'N/A' }}</span>
                                         </td>
                                         <td class="px-6 py-5 text-right">
-                                            <button class="text-indigo-600 hover:text-indigo-900 transition font-black text-[10px] uppercase">
+                                            <a href="{{ route('estudantes.show',$orientado->estudante->id) }}"  class="text-indigo-600 hover:text-indigo-900 transition font-black text-[10px] uppercase">
                                                 <i class="fas fa-search-plus mr-1"></i> Detalhes
-                                            </button>
+                                            </a>
                                         </td>
                                     </tr>
                                 @empty
@@ -141,28 +145,8 @@
                     </div>
                 </div>
 
-                {{-- HISTÓRICO DE ACOMPANHAMENTOS --}}
-                <div class="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden">
-                    <div class="px-8 py-6 border-b border-gray-50 bg-gray-900 text-white">
-                        <h3 class="font-black uppercase tracking-widest text-xs">Logs de Acompanhamento TCC</h3>
-                    </div>
-                    <div class="p-4 space-y-3">
-                        @forelse($professor->acompanhamentos as $acomp)
-                            <div class="flex items-center justify-between p-4 border border-gray-50 rounded-2xl hover:border-indigo-100 transition shadow-sm">
-                                <div class="flex items-center">
-                                    <div class="w-2 h-2 rounded-full bg-indigo-500 mr-4"></div>
-                                    <div>
-                                        <p class="text-xs font-black text-gray-800">Interação Registrada</p>
-                                        <p class="text-[10px] text-gray-400 italic">{{ $acomp->created_at->diffForHumans() }}</p>
-                                    </div>
-                                </div>
-                                <span class="text-[10px] font-black bg-gray-100 px-3 py-1 rounded-full uppercase text-gray-500">Log #{{ $acomp->id }}</span>
-                            </div>
-                        @empty
-                            <p class="p-6 text-center text-gray-400 text-xs italic">Nenhum registro de acompanhamento encontrado.</p>
-                        @endforelse
-                    </div>
-                </div>
+
+                
 
             </div>
         </div>

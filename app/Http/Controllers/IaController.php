@@ -958,6 +958,157 @@ public function gerar(Request $request)
     }
 }
 
+
+public function gerarPorNarrativa(Request $request)
+{
+    $request->validate([
+        'area_nome' => ['required', 'string', 'min:3', 'max:255'],
+        'tipo_projeto' => ['required', 'in:teorico,pratico'],
+        'narrativa' => ['required', 'string', 'min:10', 'max:2000'],
+    ]);
+
+    try {
+        $area = trim($request->area_nome);
+        $narrativa = trim($request->narrativa);
+
+        // Validação básica anti-spam
+        $palavrasInvalidas = ['aaa', 'bbb', 'teste', '123', 'abc', 'xxxx', 'nada'];
+        foreach ($palavrasInvalidas as $palavra) {
+            if (str_contains(strtolower($narrativa), $palavra) || str_contains(strtolower($area), $palavra)) {
+                return back()->withInput()->with('error', 'Os dados fornecidos parecem inválidos ou sem contexto acadêmico.');
+            }
+        }
+
+        $apiKey = env('GROQ_API_KEY');
+        if (!$apiKey) {
+            return back()->withInput()->with('error', 'A chave da inteligência artificial não foi configurada.');
+        }
+
+        $estudante = Auth::user()->estudante;
+        if (!$estudante) {
+            return back()->with('error', 'Apenas estudantes podem usar esta funcionalidade.');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Prompt Adaptado para Narrativa Livre
+        |--------------------------------------------------------------------------
+        */
+        $prompt = "
+        Você é um orientador universitário extremamente rigoroso.
+        O estudante enviou uma ideia/narrativa livre sobre o que deseja pesquisar.
+        Sua missão é transformar essa narrativa bruta em 3 temas acadêmicos formais, inovadores e bem estruturados.
+
+        Analise a narrativa buscando:
+        - Coerência técnica e relevância acadêmica.
+        - Se há sentido lógico na proposta.
+
+        REGRAS IMPORTANTES:
+        1. Se a narrativa for vaga demais, desconexa, piada, ofensiva ou sem nenhum potencial científico, NÃO gere temas. Devolva o JSON de erro abaixo.
+        {
+          \"status\": \"erro\",
+          \"mensagem\": \"Sua narrativa está muito vaga ou carece de contexto científico. Por favor, detalhe melhor sua ideia.\"
+        }
+
+        2. Se for válida, gere EXATAMENTE 3 temas formais baseados na ideia dele.
+         Responda APENAS JSON VÁLIDO no formato abaixo. Não escreva nada antes ou depois.
+
+        Dados do estudante:
+        Área científica sugerida: {$area}
+        Tipo do projeto: {$request->tipo_projeto}
+        Narrativa/Ideia do Estudante:
+        \"{$narrativa}\"
+
+        Modelo obrigatório de sucesso:
+        {
+          \"status\": \"sucesso\",
+          \"temas\": [
+            {
+              \"titulo\": \"Título Acadêmico Profissional\",
+              \"descricao\": \"Descrição objetiva detalhando a abordagem baseada na narrativa do aluno.\"
+            }
+          ]
+        }
+        ";
+
+        // Chamada API (Exatamente igual ao seu método gerar original)
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Content-Type'   => 'application/json',
+        ])
+        ->timeout(60)
+        ->post('https://api.groq.com/openai/v1/chat/completions', [
+            'model' => 'llama-3.3-70b-versatile',
+            'messages' => [
+                ['role' => 'user', 'content' => $prompt]
+            ],
+            'temperature' => 0.3, // Um pouco mais criativo para interpretar o texto do aluno
+            'max_tokens' => 1500,
+            'response_format' => ['type' => 'json_object']
+        ]);
+
+        if ($response->failed()) {
+            Log::error('ERRO GROQ NARRATIVA', ['status' => $response->status(), 'body' => $response->body()]);
+            return back()->withInput()->with('error', 'Falha na comunicação com a inteligência artificial.');
+        }
+
+        $data = $response->json();
+        $content = $data['choices'][0]['message']['content'] ?? null;
+
+        if (!$content) {
+            return back()->withInput()->with('error', 'A IA não conseguiu gerar resposta.');
+        }
+
+        // Limpeza e extração do JSON (Garantia extra)
+        $content = str_replace(['```json', '```'], '', $content);
+        $content = trim($content);
+        $inicio = strpos($content, '{');
+        $fim = strrpos($content, '}');
+
+        if ($inicio === false || $fim === false) {
+            return back()->withInput()->with('error', 'A IA devolveu uma resposta inválida.');
+        }
+
+        $jsonString = substr($content, $inicio, $fim - $inicio + 1);
+        $resultado = json_decode($jsonString, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !isset($resultado['status'])) {
+            return back()->withInput()->with('error', 'A IA devolveu um formato inválido.');
+        }
+
+        if ($resultado['status'] === 'erro') {
+            return back()->withInput()->with('error', $resultado['mensagem']);
+        }
+
+        // Salvar no Banco
+        $areaModel = AreaCientifica::firstOrCreate(['nome' => $area]);
+
+        foreach ($resultado['temas'] as $tema) {
+            if (!isset($tema['titulo']) || !isset($tema['descricao'])) continue;
+
+            SugestaoTemaIa::create([
+                'estudante_id' => $estudante->id,
+                'area_id'      => $areaModel->id,
+                'tipo_projeto' => $request->tipo_projeto,
+                'titulo'       => trim($tema['titulo']),
+                'descricao'    => trim($tema['descricao']),
+                // Como veio de uma narrativa, salvamos metadados vazios ou a própria narrativa adaptada nos campos antigos se o banco exigir
+                'disciplinas'  => ['Gerado via Narrativa Livre'], 
+                'competencias' => []
+            ]);
+        }
+
+        return redirect()->route('estudante.ia.index')->with('success', 'Os temas baseados na sua ideia foram gerados com sucesso!');
+
+    } catch (\Throwable $e) {
+        Log::error('ERRO CRÍTICO IA NARRATIVA', [
+            'mensagem' => $e->getMessage(),
+            'linha' => $e->getLine(),
+            'arquivo' => $e->getFile()
+        ]);
+        return back()->withInput()->with('error', 'Ocorreu uma falha inesperada ao gerar os temas.');
+    }
+}
     public function favoritar($id)
     {
         try{

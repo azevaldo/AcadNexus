@@ -171,13 +171,13 @@ class CursoController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->route('cursos.index')
+            return redirect()->back()
                 ->with('success', 'Curso atualizado com sucesso');
 
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Erro ao atualizar curso: '.$e->getMessage());
-            return redirect()->route('cursos.index')
+            return redirect()->back()
                 ->with('error', 'Erro ao atualizar curso'.$e->getMessage());
         }
     }

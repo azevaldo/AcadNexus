@@ -59,6 +59,7 @@ class ProfileProfessorController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'max_orientacoes' => ['required', 'integer', 'min:1', 'max:50'], // Validação do novo campo institucional
             'areas' => ['nullable', 'array'],
+            'telefone' => ['required'],
             'areas.*' => ['exists:areas_cientificas,id'], 
         ]);
  
@@ -67,6 +68,7 @@ class ProfileProfessorController extends Controller
                 $user->update([
                     'name' => $request->name,
                     'email' => $request->email,
+                                        'telefone' => $request->telefone,
                 ]);
 
                 // 2. Atualiza os dados específicos do professor (incluindo o máximo de orientações)

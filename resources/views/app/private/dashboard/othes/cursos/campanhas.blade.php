@@ -33,11 +33,26 @@
             </a>
         @endif
 
+        @hasanyrole('admin|coordenador')
+        @role('admin')
         <a href="{{ route('cursos.campanhas.create',$curso->id) }}"
            class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5 active:scale-95">
             <i class="fas fa-plus-circle mr-2"></i>
             Nova Campanha
         </a>
+
+        @endrole
+
+        @if(auth()->user()->ehCoordenadorDoCurso($curso->id))
+        <a href="{{ route('cursos.campanhas.create',$curso->id) }}"
+           class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5 active:scale-95">
+            <i class="fas fa-plus-circle mr-2"></i>
+            Nova Campanha
+        </a>
+
+        @endif
+        @endhasanyrole
+
     </div>
 </div>
 
@@ -95,7 +110,9 @@
                                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Ver Detalhes">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                @hasanyrole('secretaria|admin|coordenador')
+                                @hasanyrole('admin|coordenador')
+
+                                @role('admin')
                   <a href="{{ route('campanhas.edit', $campanha->id) }} " 
                                    class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Editar">
                                     <i class="fas fa-edit"></i>
@@ -109,6 +126,24 @@
                                         class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Eliminar">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
+
+                                @endrole
+                                @if(auth()->user()->ehCoordenadorDoCurso($curso->id))
+                  <a href="{{ route('campanhas.edit', $campanha->id) }} " 
+                                   class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                             <button onclick="openModal('prazosModal{{ $campanha->id }}')" 
+        class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" 
+        title="Ajustar Prazos">
+    <i class="fas fa-calendar-alt"></i>
+</button>
+                                <button onclick="openModal('deleteModal{{ $campanha->id }}')" 
+                                        class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Eliminar">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+
+                                @endif
                                 @endhasanyrole
                            
                             </div>
@@ -136,13 +171,26 @@
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Prazo de Submissão</label>
                 <input type="date" name="prazo_submissao" value="{{ $campanha->prazo_submissao }}" required
-                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+                      
+                
+                            
+                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl
+                                   focus:ring-4 focus:ring-blue-500/20
+                                   focus:border-blue-500 outline-none transition"
+                
+                >
             </div>
 
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Prazo de Melhorias</label>
                 <input type="date" name="prazo_melhorias" value="{{ $campanha->prazo_melhorias }}"
-                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+                       
+                min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                            
+                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl
+                                   focus:ring-4 focus:ring-blue-500/20
+                                   focus:border-blue-500 outline-none transition"
+                >
             </div>
 
             <div class="flex gap-3 pt-4">

@@ -19,12 +19,12 @@ public function __construct()
         $this->middleware('auth');
 
         // 2. Index e Show: Acessíveis por todos os cargos mencionados
-        $this->middleware('roles:coordenador|professor|secretaria|admin|estudante')
-             ->only(['index', 'show', 'indexPorCurso','estudantes']);
+        $this->middleware('roles:coordenador|professor|admin|estudante')
+             ->only(['show', 'indexPorCurso','estudantes']);
     
         // 3. Restante dos métodos: Apenas cargos administrativos
-        $this->middleware('roles:coordenador|admin|secretaria')
-             ->except(['index', 'show', 'indexPorCurso','estudantes']);
+        $this->middleware('roles:coordenador|admin')
+             ->only(['index']);
     }
 
 public function cursoCampanhaCreate(Curso $curso){
@@ -37,7 +37,7 @@ public function indexPorCurso(Curso $curso)
     $campanhas = Campanha::where('curso_id', $curso->id)
         ->with('curso.departamento')
         ->orderBy('created_at', 'desc')
-        ->paginate(1);
+        ->paginate(10);
 
     return view('app.private.dashboard.othes.cursos.campanhas', compact('campanhas', 'curso'));
     } catch (\Exception $e) {
@@ -395,7 +395,7 @@ public function updatePrazos(Request $request, Campanha $campanha)
 
             DB::commit();
 
-            return redirect()->route('campanhas.index')
+            return redirect()->route('cursos.campanhas',$campanha->curso_id)
                 ->with('success','Campanha atualizada.');
 
         } catch (Exception $e) {
@@ -403,7 +403,7 @@ public function updatePrazos(Request $request, Campanha $campanha)
             DB::rollBack();
             Log::error($e->getMessage());
 
-            return back()->withErrors('Erro ao atualizar.');
+            return back()->with('error','Erro ao atualizar : '.$e->getMessage());
         }
     }
 
@@ -424,7 +424,7 @@ public function updatePrazos(Request $request, Campanha $campanha)
             DB::rollBack();
             Log::error($e->getMessage());
 
-            return back()->withErrors('Erro ao eliminar.');
+            return back()->with('error','Erro ao eliminar : '.$e->getMessage());
         }
     }
 }

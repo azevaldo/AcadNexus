@@ -5,12 +5,16 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use NotificationChannels\Twilio\TwilioChannel; // <-- ADICIONADO
+use NotificationChannels\Twilio\TwilioSmsMessage; // <-- ADICIONADO
 use App\Models\AvaliacaoFase;
 
-class AvaliacaoFaseNotification extends Notification
+class AvaliacaoFaseNotification extends Notification implements ShouldQueue
 {
     use Queueable;
-
+    
+    public $tries = 3;
     protected $avaliacao;
 
     public function __construct(AvaliacaoFase $avaliacao)
@@ -20,7 +24,8 @@ class AvaliacaoFaseNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        // Adicionado o TwilioChannel à lista
+        return ['database', 'mail', TwilioChannel::class];
     }
 
     public function toMail($notifiable)
@@ -40,6 +45,20 @@ class AvaliacaoFaseNotification extends Notification
             ->action('Ver Avaliação no Painel', $url)
             ->line('Consulte o seu painel de acompanhamento para ler as observações completas deixadas pelo seu orientador.')
             ->salutation('Atenciosamente, Portal de TCC.');
+    }
+
+    /**
+     * Envio de SMS via Twilio
+     */
+    public function toTwilio($notifiable)
+    {
+        $submissao = $this->avaliacao->submissao;
+        $fase = $submissao->fase;
+        $tutorUser = $this->avaliacao->tutor->user;
+        $resultado = strtoupper($this->avaliacao->decisao);
+
+        return (new TwilioSmsMessage())
+            ->content("Ola {$notifiable->name}, sua submissao na fase '{$fase->fase}' foi avaliada pelo Prof. {$tutorUser->name}. Resultado: {$resultado}. Verifique no painel.");
     }
 
     public function toArray($notifiable)

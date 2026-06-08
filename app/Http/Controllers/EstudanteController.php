@@ -102,6 +102,7 @@ public function create_estudante()
             $query->where('ativo', true);
         }])
         ->get();
+       // dd($tutores);
 
     return view(
         'app.private.dashboard.othes.estudantes.edit',
@@ -136,7 +137,11 @@ public function create_estudante()
         'size:14',
         'regex:/^\d{9}[A-Z]{2}\d{3}$/i',
         'unique:estudantes,bi'
-    ],
+    ]
+    ,
+     'telefone' => [
+        'required',
+            ],
     
     'ano_frequencia' => 'required|in:4,5',
     
@@ -157,6 +162,7 @@ public function create_estudante()
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
+                                'telefone' => $request->telefone,
                 'password' => Hash::make($request->password)
             ]);
 
@@ -193,6 +199,7 @@ return redirect()->route('dashboard')->with('success','Usuario registrado com su
     public function update(Request $request, $id)
 {
     try{
+        
 
        $request->validate([
     // Nome válido (apenas letras e espaços)
@@ -210,6 +217,9 @@ return redirect()->route('dashboard')->with('success','Usuario registrado com su
         'email',
         'unique:users,email,' . $estudante->user_id
     ],
+     'telefone' => [
+        'required',
+            ],
     
     // BI validado (9 números + 2 letras + 3 números) ignorando o próprio registro
     'bi' => [
@@ -247,6 +257,7 @@ return redirect()->route('dashboard')->with('success','Usuario registrado com su
         $estudante->user->update([
             'name' => $request->name,
             'email' => $request->email,
+                        'telefone' => $request->telefone,
         ]);
 
         $estudante->update([

@@ -302,7 +302,7 @@
                     <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Ano de Frequência</label>
                     <select name="ano" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
                         <option value="">Todos os Anos</option>
-                        @for ($i = 1; $i <= 5; $i++)
+                        @for ($i = 4; $i <= 5; $i++)
                             <option value="{{ $i }}" {{ request('ano') == $i ? 'selected' : '' }}>{{ $i }}º Ano</option>
                         @endfor
                     </select>

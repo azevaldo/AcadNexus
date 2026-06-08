@@ -1,4 +1,11 @@
 <?php return array (
+  'laravel-notification-channels/twilio' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'NotificationChannels\\Twilio\\TwilioProvider',
+    ),
+  ),
   'laravel/breeze' => 
   array (
     'providers' => 

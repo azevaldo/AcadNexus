@@ -150,7 +150,36 @@ class ProfessorController extends Controller
             return back()->with('error','Erro ao abrir formulário : '.$e->getMessage());
         }
     }
+public function meusDepartamentos()
+    {
+        try {
+            // 1. Obtém o usuário autenticado
+            $user = Auth::user();
 
+            if (!$user) {
+                return redirect()->route('login')
+                    ->with('error', 'É necessário estar autenticado para acessar esta página.');
+            }
+
+            // 2. Busca o registro do professor associado ao usuário logado
+            // Se não encontrar, lança uma ModelNotFoundException automaticamente
+            $professor = \App\Models\Professor::where('user_id', $user->id)->firstOrFail();
+
+            // 3. Obtém os departamentos vinculados usando o relacionamento belongsToMany com paginação
+            $departamentos = $professor->departamentos()->paginate(10);
+
+            // 4. Retorna a view com os dados
+            return view('app.private.dashboard.othes.professores.departamentos', compact('departamentos'));
+
+        } catch (ModelNotFoundException $e) {
+            // Captura o erro caso o usuário logado não possua um registro na tabela 'professores'
+            return redirect()->back()->with('error', 'Perfil de professor não encontrado para este usuário.');
+            
+        } catch (Exception $e) {
+            // Captura qualquer outro tipo de erro inesperado (ex: falha de banco de dados)
+            return redirect()->back()->with('error', 'Ocorreu um erro ao carregar os seus departamentos. Tente novamente mais tarde.');
+        }
+    }
     public function store(Request $request)
     {
         try {
@@ -159,6 +188,7 @@ class ProfessorController extends Controller
                 'name' => ['required','string','max:255'],
                 'email' => ['required','email','unique:users,email'],
                 'password' => ['required','confirmed','min:8'],
+                'telefone' => ['required'],
                 'departamentos' => ['required','array','min:1'],
                 'areas' => ['required','array','min:1'],
             ]);
@@ -168,6 +198,7 @@ class ProfessorController extends Controller
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
+                                'telefone' => $request->telefone,
                 'password' => Hash::make($request->password),
             ]);
 
@@ -202,12 +233,14 @@ $user-> assignRole('professor');
     {
         try {
 
+            $depa=$professor->departamento;
             return view(
                 'app.private.dashboard.othes.professores.edit',
                 [
                     'professor' => $professor,
                     'departamentos' => Departamento::orderBy('nome')->get(),
-                    'areas' => AreaCientifica::orderBy('nome')->get()
+                    'areas' => AreaCientifica::orderBy('nome')->get(),
+                    'depa'=>$depa,
                 ]
             );
 
@@ -243,7 +276,7 @@ $user-> assignRole('professor');
             DB::commit();
 
             return redirect()
-                ->route('professores.index')
+                ->back()
                 ->with('success','Professor atualizado com sucesso.');
 
         } catch (Exception $e) {

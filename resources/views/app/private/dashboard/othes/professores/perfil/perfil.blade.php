@@ -134,6 +134,12 @@
                             </div>
                         </div>
 
+                         <div>
+                            <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Telfone</label>
+                            <input type="text" name="telefone" value="{{ old('telefone', $user->telefone) }}" required 
+                                   class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none font-bold text-sm transition-all">
+                            @error('telefone') <p class="text-rose-600 text-xs mt-1 font-semibold">{{ $message }}</p> @enderror
+                        </div>
                         {{-- Áreas Científicas de Atuação (Múltipla Escolha Moderna) --}}
                         <div class="md:col-span-2">
                             <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Áreas Científicas de Especialidade (Selecione as suas)</label>

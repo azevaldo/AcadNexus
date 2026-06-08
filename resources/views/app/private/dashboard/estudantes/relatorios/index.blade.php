@@ -14,11 +14,7 @@
                 <p class="text-gray-500 text-sm mt-2">Visão consolidada de anteprojetos, orientações e progresso.</p>
             </div>
             
-            <div class="flex gap-3">
-                <button onclick="window.print()" class="bg-white border border-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-black text-xs uppercase hover:bg-gray-50 transition shadow-sm">
-                    <i class="fas fa-print mr-2"></i> Imprimir Tudo
-                </button>
-            </div>
+           
         </div>
 
         {{-- GRID DE STATS (KPIs) --}}

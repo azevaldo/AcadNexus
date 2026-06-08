@@ -8,7 +8,7 @@
     <div class="flex justify-between items-center mb-8">
         <div>
             <h1 class="text-3xl font-bold text-gray-800 uppercase tracking-tight">
-                Cursos: {{ $departamento->nome }}
+                Departamento: {{ $departamento->nome }}
             </h1>
             <p class="text-gray-500 text-sm mt-1 font-medium">
                 Lista de cursos vinculados a este departamento
@@ -16,18 +16,28 @@
         </div>
 
         <div class="flex gap-4">
-            <a href="{{ route('departamentos.index') }}" 
-               class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-semibold transition duration-200 flex items-center gap-2">
-                <i class="fas fa-arrow-left text-xs"></i> Voltar
-            </a>
+           <a href="{{ $caminho }}" 
+   class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-semibold transition duration-200 flex items-center gap-2">
+    <i class="fas fa-arrow-left text-xs"></i> Voltar
+</a>
 
-            @hasanyrole('secretaria|admin')
+            @hasanyrole('coordenador|admin')
+      @if(auth()->user()->ehCoordenadorDoDepartamento($departamento->id))
+<button onclick="openModal('createCursoModal')"
+                class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90
+                       text-white px-6 py-3 rounded-2xl font-semibold shadow-lg
+                       transition duration-200">
+                + Novo Curso
+            </button>
+      @endif
+            @role('admin')
             <button onclick="openModal('createCursoModal')"
                 class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90
                        text-white px-6 py-3 rounded-2xl font-semibold shadow-lg
                        transition duration-200">
                 + Novo Curso
             </button>
+            @endrole
             @endhasanyrole
         </div>
     </div>
@@ -74,9 +84,11 @@
             <i class="fas fa-bullhorn"></i>
         </a>
 
-        @hasanyrole('secretaria|admin')
-
+        @hasanyrole('coordenador|admin')
+       
         <!-- EDITAR -->
+         @role('coordenador')
+      @if(auth()->user()->ehCoordenadorDoCurso($curso->id))
         <button onclick="openModal('editCursoModal{{ $curso->id }}')"
                 class="text-slate-500 hover:text-blue-600 transition duration-200"
                 title="Editar Curso">
@@ -89,7 +101,23 @@
                 title="Eliminar Curso">
             <i class="fas fa-trash"></i>
         </button>
+        @endif
+        @endrole
+ @role('admin')
+          <!-- EDITAR -->
+        <button onclick="openModal('editCursoModal{{ $curso->id }}')"
+                class="text-slate-500 hover:text-blue-600 transition duration-200"
+                title="Editar Curso">
+            <i class="fas fa-pen-to-square"></i>
+        </button>
 
+        <!-- ELIMINAR -->
+        <button onclick="openModal('deleteCursoModal{{ $curso->id }}')"
+                class="text-slate-500 hover:text-red-600 transition duration-200"
+                title="Eliminar Curso">
+            <i class="fas fa-trash"></i>
+        </button>
+        @endrole
         @endhasanyrole
 
     </div>
@@ -211,6 +239,7 @@
 <p class="text-xs text-gray-500 mt-2">
     Mínimo de 3 caracteres. Apenas letras, números e espaços.
 </p>
+<input type="text" name="departamento_id" value="{{$departamento->id}}" hidden>
                             
                             <div class="flex justify-end gap-3 mt-6">
                                 <button type="button" onclick="closeModal('editCursoModal{{ $curso->id }}')"

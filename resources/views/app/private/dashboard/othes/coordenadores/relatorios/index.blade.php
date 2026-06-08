@@ -74,7 +74,7 @@
                             <tr class="text-[10px] font-black text-slate-400 uppercase border-b border-slate-50">
                                 <th class="px-6 py-4">Professor</th>
                                 <th class="px-6 py-4">Orientandos</th>
-                                <th class="px-6 py-4 text-center">Status</th>
+                                <th class="px-6 py-4 text-center">Estado</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-50">
@@ -85,14 +85,14 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-xs font-bold text-indigo-600">{{ $prof->estudantes_count }}</span>
+                                        <span class="text-xs font-bold text-indigo-600">{{ $prof->total_orientandos }}</span>
                                         <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden w-20">
-                                            <div class="bg-indigo-500 h-full" style="width: {{ ($prof->estudantes_count / 10) * 100 }}%"></div>
+                                            <div class="bg-indigo-500 h-full" style="width: {{ ($prof->total_orientandos / $prof->max_orientacoes) * 100 }}%"></div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    @if($prof->estudantes_count >= 8)
+                                    @if($prof->total_orientandos >= $prof->max_orientacoes)
                                         <span class="px-2 py-1 bg-red-100 text-red-600 text-[9px] font-black rounded-full uppercase">Carga Máxima</span>
                                     @else
                                         <span class="px-2 py-1 bg-green-100 text-green-600 text-[9px] font-black rounded-full uppercase">Disponível</span>

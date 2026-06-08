@@ -124,7 +124,7 @@
                                    title="Ver Perfil do Professor">
                                     <i class="fas fa-info-circle text-xs"></i>
                                 </a>
-
+                                @hasanyrole('admin|professor|coordenador')
                                 <a href="{{ route('professores.estudantesAcompanhados', $prof->id) }}"
                                    class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 transition relative"
                                    title="Ver Alunos em Acompanhamento">
@@ -135,6 +135,7 @@
                                         </span>
                                     @endif
                                 </a>
+                                @endhasanyrole
 
                             </div>
                         </td>

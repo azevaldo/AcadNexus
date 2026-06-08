@@ -57,11 +57,13 @@
                  
                     @if($fase2==true)
                         @if($anteprojeto->status == 'melhorias')
-                            <a href="{{ route('estudante.anteprojetos.nova_versao', $anteprojeto->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center">
-                                <i class="fas fa-sync-alt mr-2"></i> Enviar Nova Versão
-                            </a>
+                           <a href="{{ route('estudante.anteprojetos.nova_versao', $anteprojeto->id) }}" 
+   class="group bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 mb-8 rounded-2xl font-black text-xs uppercase tracking-wider shadow-xl shadow-amber-500/20 active:scale-95 transition-all duration-300 flex items-center justify-center inline-flex">
+    <i class="fas fa-sync-alt mr-2.5 transition-transform duration-500 group-hover:rotate-180 text-sm"></i> 
+    Enviar Nova Versão
+</a>
                         @elseif($anteprojeto->status =='rejeitado' && $totalAnteprojetos==1  && $totalVersoes==1)
-                            <a href="{{ route('estudante.anteprojetos.create', $campanha->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center">
+                            <a href="{{ route('estudante.anteprojetos.create', $campanha->id) }}" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-amber-200 transition-all flex items-center ">
                                 <i class="fas fa-sync-alt mr-2"></i>    Novo Anteprojeto
                             </a>
                             @elseif($anteprojeto->status =='rejeitado' && $totalVersoes>1)

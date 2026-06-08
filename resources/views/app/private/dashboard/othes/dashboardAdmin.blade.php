@@ -14,7 +14,7 @@
         <div class="flex items-center space-x-4">
             <span class="text-xs font-medium text-gray-400">{{ now()->format('d/m/Y H:i') }}</span>
             <div class="h-10 w-10 rounded-full bg-gray-900 flex items-center justify-center text-white">
-                <i class="fas fa-cog animate-spin-slow"></i>
+              <a href="{{route('profile.admin.edit')}}"> <i class="fas fa-cog animate-spin-slow"></i></a> 
             </div>
         </div>
     </header>
@@ -71,7 +71,7 @@
                 <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
                     <div class="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/10">
                         <h3 class="font-black text-gray-800 text-lg uppercase tracking-tighter">Últimos Registos</h3>
-                        <button class="text-xs font-bold text-indigo-600 hover:underline">Gerenciar todos</button>
+                        <a href="{{ route('admin.usuarios.recentes') }}" class="text-xs font-bold text-indigo-600 hover:underline">Gerenciar todos</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -108,27 +108,7 @@
                 </div>
             </div>
 
-            {{-- Sidebar Admin --}}
-            <div class="space-y-6">
-                {{-- Ações Rápidas de Admin --}}
-                <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                    <h4 class="font-black text-xs uppercase tracking-widest text-gray-400 mb-6 italic">Ações de Sistema</h4>
-                    <div class="grid grid-cols-1 gap-3">
-                        <button class="flex items-center p-4 bg-indigo-50 text-indigo-700 rounded-2xl hover:bg-indigo-100 transition group">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition">
-                                <i class="fas fa-plus"></i>
-                            </div>
-                            <span class="text-xs font-black uppercase">Novo Curso</span>
-                        </button>
-                        
-                        <button class="flex items-center p-4 bg-gray-50 text-gray-700 rounded-2xl hover:bg-gray-100 transition group">
-                            <div class="w-10 h-10 rounded-xl bg-gray-800 text-white flex items-center justify-center mr-4 shadow-lg group-hover:scale-110 transition">
-                                <i class="fas fa-database"></i>
-                            </div>
-                            <span class="text-xs font-black uppercase">Backup DB</span>
-                        </button>
-                    </div>
-                </div>
+           
 
                 {{-- Performance por Curso --}}
                 <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">

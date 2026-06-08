@@ -78,7 +78,7 @@
                             </div>
                         @else
                             <div class="space-y-3">
-                                @foreach($acompanhamento->fases as $fase)
+                                @foreach($acompanhamento->fases()->take(2)->get() as $fase)
                                     <div class="flex items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
                                         <div class="flex-1">
                                             <h4 class="text-xs font-black text-gray-800 uppercase">{{ $fase->fase }}</h4>
@@ -102,7 +102,7 @@
                         <h3 class="font-black text-gray-800 text-xs uppercase tracking-widest">Minhas Campanhas</h3>
                     </div>
                     <div class="p-6">
-                        @forelse($estudante->campanhas as $campanha)
+                        @forelse($estudante->campanhas()->take(2)->get() as $campanha)
                             <div class="p-4 border border-indigo-50 bg-indigo-50/30 rounded-2xl mb-4 last:mb-0">
                                 <h4 class="text-xs font-black text-indigo-900 uppercase leading-tight">{{ $campanha->nome }}</h4>
                                 <div class="flex justify-between items-center mt-3">
@@ -168,7 +168,7 @@
                 {{-- ANTEPROJETOS RECENTES --}}
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
                     <h4 class="text-[10px] font-black text-gray-400 uppercase mb-6 tracking-widest">Anteprojetos Recentes</h4>
-                    @forelse($estudante->anteprojetos as $anteprojeto)
+                    @forelse($estudante->anteprojetos()->take(3)->get() as $anteprojeto)
                         <div class="mb-4 p-3 border-l-2 border-indigo-500 bg-gray-50 rounded-r-xl">
                             <h5 class="text-[11px] font-black text-gray-800 uppercase leading-tight">{{ $anteprojeto->titulo }}</h5>
                             <p class="text-[9px] text-gray-400 font-bold mt-1 uppercase">{{ $anteprojeto->campanha->nome ?? 'S/ Campanha' }}</p>
@@ -181,18 +181,7 @@
                     @endforelse
                 </div>
 
-                {{-- INFO DEPARTAMENTO --}}
-                <div class="bg-indigo-900 text-white p-8 rounded-[2.5rem] shadow-xl shadow-indigo-100">
-                    <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Unidade Orgânica</p>
-                    <h3 class="text-sm font-black uppercase leading-relaxed">
-                        {{ $estudante->curso->departamento->nome ?? 'Departamento não disponível' }}
-                    </h3>
-                    <div class="mt-8 pt-6 border-t border-indigo-800">
-                        <button class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs py-4 rounded-2xl transition shadow-lg uppercase tracking-tighter">
-                            Abrir Documentação TCC
-                        </button>
-                    </div>
-                </div>
+             
             </div>
 
         </div>

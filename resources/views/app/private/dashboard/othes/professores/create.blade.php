@@ -42,7 +42,7 @@
                         Nome
                     </label>
                     <input type="text"
-       name="nome"
+       name="name"
       
        required
        minlength="3"

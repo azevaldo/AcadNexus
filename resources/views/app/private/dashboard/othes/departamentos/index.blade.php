@@ -114,9 +114,10 @@
                                    name="nome"
                                    value="{{ $departamento->nome }}"
                                    required
-                                   class="w-full px-4 py-3 rounded-xl border
-                                          focus:ring-2 focus:ring-blue-500
-                                          focus:outline-none">
+                                  class="w-full px-4 py-3 rounded-xl border
+                              focus:ring-2 focus:ring-blue-500
+                              focus:outline-none"  minlength="5"
+                            maxlength="255">
 
                             <div class="flex justify-end gap-3 mt-6">
                                 <button type="button"

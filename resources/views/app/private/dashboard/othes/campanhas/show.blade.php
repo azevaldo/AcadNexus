@@ -30,7 +30,8 @@
     {{-- Bloco de Ações (Buttons) --}}
     <div class="flex flex-wrap gap-3 w-full lg:w-auto justify-start lg:justify-end">
         @hasanyrole('admin|coordenador')
-            <button onclick="openModal('prazosModal{{ $campanha->id }}')"
+        @role('admin')
+ <button onclick="openModal('prazosModal{{ $campanha->id }}')"
                 class="bg-indigo-600 text-white hover:bg-indigo-700 px-5 py-3 rounded-xl font-bold transition shadow-md shadow-indigo-200 border border-transparent text-sm active:scale-[0.98]">
                 <i class="fas fa-calendar-plus mr-2"></i> Ajustar Prazos
             </button>
@@ -39,6 +40,19 @@
                class="bg-white text-slate-700 hover:bg-slate-50 px-5 py-3 rounded-xl font-bold transition shadow-sm border border-slate-200 text-sm">
                 <i class="fas fa-edit mr-2 text-amber-500"></i> Editar Campanha
             </a>
+        @endrole
+           @if(auth()->user()->ehCoordenadorDoCurso($campanha->curso_id))
+ <button onclick="openModal('prazosModal{{ $campanha->id }}')"
+                class="bg-indigo-600 text-white hover:bg-indigo-700 px-5 py-3 rounded-xl font-bold transition shadow-md shadow-indigo-200 border border-transparent text-sm active:scale-[0.98]">
+                <i class="fas fa-calendar-plus mr-2"></i> Ajustar Prazos
+            </button>
+
+            <a href="{{ route('campanhas.edit', $campanha->id) }}"
+               class="bg-white text-slate-700 hover:bg-slate-50 px-5 py-3 rounded-xl font-bold transition shadow-sm border border-slate-200 text-sm">
+                <i class="fas fa-edit mr-2 text-amber-500"></i> Editar Campanha
+            </a>
+           @endif
+           
         @endhasanyrole
         
         <a href="{{ route('admin.campanhas.anteprojetos', $campanha->id) }}"
@@ -147,7 +161,7 @@
     </div>
 </div>
 
-@hasanyrole('admin|coordenador|secretaria')
+@hasanyrole('admin|coordenador')
 <div id="prazosModal{{ $campanha->id }}" class="fixed inset-0 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm z- p-4">
     <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl border border-slate-100 animate-fadeIn">
         
@@ -167,7 +181,7 @@
                 <div class="relative">
                     <i class="fas fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                     <input type="date" name="prazo_submissao" value="{{ $campanha->prazo_submissao }}" required
-                        class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all font-medium text-slate-700">
+                         class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all font-medium text-slate-700">
                 </div>
             </div>
 
@@ -176,7 +190,7 @@
                 <div class="relative">
                     <i class="fas fa-tools absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                     <input type="date" name="prazo_melhorias" value="{{ $campanha->prazo_melhorias }}" 
-                        class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all font-medium text-slate-700">
+                      min="{{ date('Y-m-d', strtotime('+1 day')) }}"   class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all font-medium text-slate-700">
                 </div>
             </div>
 

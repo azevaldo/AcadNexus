@@ -35,12 +35,14 @@ class ProfileAdminController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:100', 'regex:/^[A-Za-zÀ-ÖØ-öø-ÿÇç0-9][A-Za-zÀ-ÖØ-öø-ÿÇç0-9 ]{2,}$/'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+             'telefone' => ['required'],
         ]);
 
        
             $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
+                'telefone' => $request->telefone,
             ]);
 
             return redirect()->route('profile.admin.edit')->with('success', 'Perfil de administrador atualizado com sucesso!');

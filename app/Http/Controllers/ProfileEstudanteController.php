@@ -53,6 +53,7 @@ class ProfileEstudanteController extends Controller
             'regime' => ['required', Rule::in(['Regular', 'Pós Laboral'])],
         ]);
 */
+//dd($request->numero_matriculaa);
             $request->validate([
     // Nome válido (apenas letras e espaços)
    'name' => [
@@ -68,6 +69,10 @@ class ProfileEstudanteController extends Controller
         'required',
         'email',
         'unique:users,email,' . $estudante->user_id
+    ],
+    'telefone' => [
+        'required',
+        
     ],
     
     // BI validado (9 números + 2 letras + 3 números) ignorando o próprio registro
@@ -104,6 +109,7 @@ class ProfileEstudanteController extends Controller
                 $user->update([
                     'name' => $request->name,
                     'email' => $request->email,
+                                       'telefone' => $request->telefone,
                 ]);
 
                 // 2. Atualiza dados da tabela 'estudantes' (mantendo curso_id e numero_matricula protegidos)

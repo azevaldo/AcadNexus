@@ -5,13 +5,17 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use NotificationChannels\Twilio\TwilioChannel; // <-- ADICIONADO
+use NotificationChannels\Twilio\TwilioSmsMessage; // <-- ADICIONADO
 use App\Models\AnteprojetoVersao;
 
-class NovoAnteprojetoNotification extends Notification
+class NovoAnteprojetoNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     protected $versao;
+    public $tries = 3;
 
     public function __construct(AnteprojetoVersao $versao)
     {
@@ -20,7 +24,8 @@ class NovoAnteprojetoNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        // Adicionado o TwilioChannel à lista
+        return ['database', 'mail', TwilioChannel::class];
     }
 
     public function toMail($notifiable)
@@ -37,6 +42,18 @@ class NovoAnteprojetoNotification extends Notification
             ->action('Analisar Proposta', $url)
             ->line('Este projeto pertence ao departamento do seu curso. Aceda para conferir o histórico completo e os dados enviados.')
             ->salutation('Atenciosamente, Direção de TCC.');
+    }
+
+    /**
+     * Envio de SMS via Twilio
+     */
+    public function toTwilio($notifiable)
+    {
+        $anteprojeto = $this->versao->anteprojeto;
+        $estudanteUser = $anteprojeto->estudante->user;
+
+        return (new TwilioSmsMessage())
+            ->content("Ola Prof. {$notifiable->name}, o estudante {$estudanteUser->name} submeteu a Versao {$this->versao->numero_versao} do anteprojeto '{$anteprojeto->titulo}'.");
     }
 
     public function toArray($notifiable)

@@ -62,47 +62,78 @@
                 <!-- CURSO -->
  
 
-                <!-- TITULO -->
-                <div class="md:col-span-2">
-                    <label class="text-sm text-gray-600">
-                        Título
-                    </label>
+              <div class="md:col-span-2">
 
-                    <input type="text"
-                           name="titulo"
-                           class="w-full mt-1 px-3 py-2 border rounded-lg
-                                  focus:ring-2 focus:ring-blue-500"
-                           required>
-                </div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Título da Campanha
+                        </label>
 
+                        <input
+                            type="text"
+                            name="titulo"
+                            required
+                            minlength="10"
+                            maxlength="255"
+                            value="{{ old('titulo') }}"
+                            placeholder="Ex: Campanha de Submissão de Anteprojetos 2026"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl
+                                   focus:ring-4 focus:ring-blue-500/20
+                                   focus:border-blue-500 outline-none transition">
 
-                <!-- DESCRIÇÃO -->
-                <div class="md:col-span-2">
+                        <p class="text-xs text-gray-400 mt-2">
+                            O título deve ter no mínimo 10 caracteres
+                        </p>
 
-                    <label class="text-sm text-gray-600">
-                        Descrição
-                    </label>
-
-                    <textarea name="descricao"
-                              rows="4"
-                              class="w-full mt-1 px-3 py-2 border rounded-lg
-                                     focus:ring-2 focus:ring-blue-500"
-                              required></textarea>
-
-                </div>
+                    </div>
 
 
-                <!-- PRAZO -->
-                <div>
-                    <label class="text-sm text-gray-600">
-                        Prazo de Submissão
-                    </label>
+               <!-- DESCRIÇÃO -->
+                    <div class="md:col-span-2">
 
-                    <input type="date"
-                           name="prazo_submissao"
-                           class="w-full mt-1 px-3 py-2 border rounded-lg
-                                  focus:ring-2 focus:ring-blue-500">
-                </div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Descrição
+                        </label>
+
+                        <textarea
+                            name="descricao"
+                            rows="6"
+                            required
+                            minlength="20"
+                            maxlength="5000"
+                            placeholder="Descreva os objetivos e detalhes da campanha..."
+                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl
+                                   focus:ring-4 focus:ring-blue-500/20
+                                   focus:border-blue-500 outline-none transition resize-none">{{ old('descricao') }}</textarea>
+
+                        <p class="text-xs text-gray-400 mt-2">
+                            A descrição deve ter no mínimo 20 caracteres
+                        </p>
+
+                    </div>
+
+
+                    <!-- PRAZO -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Prazo de Submissão
+                        </label>
+
+                        <input
+                            type="date"
+                            name="prazo_submissao"
+                            required
+                            min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                            value="{{ old('prazo_submissao') }}"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl
+                                   focus:ring-4 focus:ring-blue-500/20
+                                   focus:border-blue-500 outline-none transition">
+
+                        <p class="text-xs text-gray-400 mt-2">
+                            A data deve ser superior à data atual
+                        </p>
+
+                    </div>
 
 
              

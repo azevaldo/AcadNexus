@@ -23,8 +23,9 @@ class ProfessorRelatorioController extends Controller
 
         // Estatísticas para o Dashboard do Professor
         $stats = [
+           // 'total_orientandos' => $professor->estudantes()->where('ativo',true)->count(),
             'total_orientandos' => $professor->estudantes->count(),
-            'total_coorientandos' => $professor->coorientados->count(),
+            'total_coorientandos' => $professor->coorientados()->count(),
             'total_acompanhamentos' => $professor->acompanhamentos->count(),
             'total_areas' => $professor->areas->count(),
         ];

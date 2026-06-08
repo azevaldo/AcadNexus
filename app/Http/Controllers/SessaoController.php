@@ -59,7 +59,7 @@ class SessaoController extends Controller
     }
 
     // Contagem de Anteprojetos Pendentes com tratamento de escopo correto
-    $queryAnteprojetos = Anteprojeto::where('status', 'pendente');
+    $queryAnteprojetos = Anteprojeto::where('status', 'submetido');
 
     // Se for apenas professor, filtra os anteprojetos que pertencem aos alunos dele (tutor ou co-tutor)
     if ($user->hasRole('professor') && !$user->hasRole('coordenador')) {
@@ -146,4 +146,5 @@ $usersByRole = \Spatie\Permission\Models\Role::withCount('users')->get();
     public function home(){
         return view('app.home.index');
     }
+     
 }

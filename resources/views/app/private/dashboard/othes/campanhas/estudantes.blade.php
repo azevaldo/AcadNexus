@@ -11,6 +11,8 @@
             <p class="text-sm text-gray-500">Lista de estudante</p>
         </div>
  @hasanyrole('admin|coordenador')
+
+ @role('admin')
  <a href="{{ route('campanhas.show', $campanha->id) }}"
                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-semibold transition duration-200 flex items-center gap-2">
                 <i class="fas fa-arrow-left text-xs"></i> 
@@ -23,6 +25,23 @@ text-white px-6 py-3 rounded-xl font-semibold shadow">
 + Novo Estudante
 
 </button>
+ @endrole
+
+  @if(auth()->user()->ehCoordenadorDoCurso($campanha->curso->id))
+ <a href="{{ route('campanhas.show', $campanha->id) }}"
+               class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl font-semibold transition duration-200 flex items-center gap-2">
+                <i class="fas fa-arrow-left text-xs"></i> 
+            </a>
+       <button
+onclick="openModal('addStudentModal')"
+class="bg-gradient-to-r from-blue-600 to-indigo-600
+text-white px-6 py-3 rounded-xl font-semibold shadow">
+
++ Novo Estudante
+
+</button>
+  @endif
+
 @endhasanyrole
     </div>
 
@@ -77,7 +96,8 @@ text-white px-6 py-3 rounded-xl font-semibold shadow">
     <i class="fas fa-info-circle text-xs"></i>
 </a>
  @hasanyrole('admin|coordenador')
- @if($estudante->anteprojetos->isEmpty())
+ @role('admin')
+@if($estudante->anteprojetos->isEmpty())
          <button onclick="openModal('removeStudentModal{{ $estudante->id }}')"
 class="text-red-600 hover:text-red-800 text-lg"
 title="Desassociar da campanha">
@@ -86,6 +106,20 @@ title="Desassociar da campanha">
 
 </button>
 @endif
+ @endrole
+
+   @if(auth()->user()->ehCoordenadorDoCurso($campanha->curso->id))
+@if($estudante->anteprojetos->isEmpty())
+         <button onclick="openModal('removeStudentModal{{ $estudante->id }}')"
+class="text-red-600 hover:text-red-800 text-lg"
+title="Desassociar da campanha">
+
+❌
+
+</button>
+@endif
+   @endif
+ 
 @endhasanyrole
                     </td>
 

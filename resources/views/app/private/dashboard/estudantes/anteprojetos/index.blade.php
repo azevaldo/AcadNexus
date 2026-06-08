@@ -100,6 +100,7 @@
                                             <i class="fas fa-file-medical transform group-hover:scale-110 transition-transform"></i>    
                                             Nova Proposta
                                         </a>
+                                       
                                     @elseif(($ultimo->status == 'rejeitado' && $totalAnteprojetos == 1 && $totalVersoes > 1) || ($ultimo->status == 'rejeitado' && $totalAnteprojetos > 1))
                                         <span class="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-100 text-slate-600 text-sm font-bold border border-slate-200">
                                             <i class="fas fa-lock text-slate-400"></i>

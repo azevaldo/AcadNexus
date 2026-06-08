@@ -279,6 +279,31 @@
 
                     </div>
 
+                    <!-- MATRÍCULA -->
+                    <div>
+
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Telefone
+                        </label>
+
+                        <input type="text"
+                               name="telefone"
+                               value="{{ old('telefone') }}"
+                               required
+                               class="w-full px-5 py-3 rounded-2xl border border-gray-300
+                                      bg-gray-50 focus:bg-white
+                                      focus:ring-4 focus:ring-blue-500/10
+                                      focus:border-blue-500 outline-none transition"
+                               placeholder="Digite sua matrícula">
+
+                        @error('telefone')
+                            <p class="text-red-500 text-sm mt-2">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                    </div>
+
 
                     <!-- MATRÍCULA -->
                     <div>

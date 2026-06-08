@@ -31,11 +31,22 @@
                 </a>
             @endif
 
-            @hasanyrole('coordenador|secretaria|admin')
+            @hasanyrole('coordenador|admin')
+
+            @role('admin')
+                                    <a href="{{ route('professores.create') }}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-blue-200 transition-all flex items-center">
+                    <i class="fas fa-plus mr-2"></i> Novo Professor
+                </a>
+             @endrole
+
+                   @if(auth()->user()->ehCoordenadorDoDepartamento($departamento->id))
                 <a href="{{ route('professores.create') }}"
                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-blue-200 transition-all flex items-center">
                     <i class="fas fa-plus mr-2"></i> Novo Professor
                 </a>
+                   @endif
+
             @endhasanyrole
         </div>
     </div>
@@ -105,6 +116,12 @@
         {{ $prof->user->acesso ? 'opacity-0 group-hover:opacity-100' : 'opacity-100' }}
         transition-all">
 
+<a href="{{ route('professores.show', $prof->id) }}"
+   class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition"
+   title="Ver Perfil">
+    <i class="fas fa-user"></i>
+</a>
+           @if(auth()->user()->ehCoordenadorDoDepartamento($departamento->id))
         <!-- EDITAR -->
         <a href="{{ route('professores.edit', $prof->id) }}"
            class="w-9 h-9 flex items-center justify-center rounded-lg
@@ -139,6 +156,38 @@
             <i class="fas fa-trash"></i>
 
         </button>
+
+           @endif
+
+           @role('admin')
+        <!-- EDITAR -->
+        <a href="{{ route('professores.edit', $prof->id) }}"
+           class="w-9 h-9 flex items-center justify-center rounded-lg
+                  text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition"
+           title="Editar">
+
+            <i class="fas fa-pen-to-square"></i>
+
+        </a>
+
+        <!-- BLOQUEAR / ATIVAR -->
+        <button onclick="openAccessModal('{{ $prof->id }}')"
+                class="w-9 h-9 flex items-center justify-center rounded-lg
+                       text-slate-500
+                       {{ $prof->user->acesso
+                            ? 'hover:bg-amber-50 hover:text-amber-600'
+                            : 'hover:bg-green-50 hover:text-green-600'
+                       }}
+                       transition"
+                title="{{ $prof->user->acesso ? 'Bloquear Acesso' : 'Conceder Acesso' }}">
+
+            <i class="fas {{ $prof->user->acesso ? 'fa-user-slash' : 'fa-user-check' }}"></i>
+
+        </button>
+
+       
+
+           @endrole
 
     </div>
 

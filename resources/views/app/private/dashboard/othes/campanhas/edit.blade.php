@@ -154,7 +154,7 @@
                             value="{{ old('prazo_submissao',$campanha->prazo_submissao) }}"
                             class="w-full px-4 py-3 border border-gray-300 rounded-2xl
                                    focus:ring-4 focus:ring-blue-500/20
-                                   focus:border-blue-500 outline-none transition">
+                                   focus:border-blue-500 outline-none transition" readonly>
 
                     </div>
 
@@ -172,27 +172,12 @@
                             value="{{ old('prazo_melhorias',$campanha->prazo_melhorias) }}"
                             class="w-full px-4 py-3 border border-gray-300 rounded-2xl
                                    focus:ring-4 focus:ring-blue-500/20
-                                   focus:border-blue-500 outline-none transition">
+                                   focus:border-blue-500 outline-none transition" readonly>
 
                     </div>
 
 
-                    <!-- NOVO PRAZO -->
-                    <div>
-
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Novo Prazo
-                        </label>
-
-                        <input
-                            type="date"
-                            name="prazo_novo"
-                            value="{{ old('prazo_novo',$campanha->prazo_novo) }}"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl
-                                   focus:ring-4 focus:ring-blue-500/20
-                                   focus:border-blue-500 outline-none transition">
-
-                    </div>
+                   
 
                 </div>
 
@@ -203,13 +188,13 @@
             <div>
 
                 <h2 class="text-lg font-semibold text-gray-800 mb-6">
-                    Status da Campanha
+                    Estado da Campanha
                 </h2>
 
                 <div class="max-w-md">
 
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        Status
+                        Estado
                     </label>
 
                     <select

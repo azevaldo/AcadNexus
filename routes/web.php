@@ -117,7 +117,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/estudante/solicitacoes', [SolicitacoesTutoriaController::class, 'indexEstudante'])->name('solicitacoes.estudante.index');
         Route::get('/estudante/solicitacoes/nova', [SolicitacoesTutoriaController::class, 'create'])->name('solicitacoes.create');
         Route::post('/estudante/solicitacoes/{professor_id}', [SolicitacoesTutoriaController::class, 'store'])->name('solicitacoes.store');
-
+Route::post('/ia/gerar-por-narrativa', [IaController::class, 'gerarPorNarrativa'])->name('estudante.ia.gerar_narrativa');
         // Assistente de Inteligência Artificial
         Route::prefix('estudante/ia')->name('estudante.ia.')->group(function () {
             Route::get('/sugestoes', [IaController::class, 'index'])->name('index');
@@ -179,7 +179,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['roles:professor'])->group(function () {
         Route::get('/minhas/campanhas', [ProfessorController::class, 'minhasCamapanhas'])->name('professores.campanhas');
-
+Route::get('/professor/meus-departamentos', [ProfessorController::class, 'meusDepartamentos'])
+        ->name('professor.departamentos');
         // Painel Interno de Orientação / Tutoria
         Route::prefix('orientacao')->name('tutor.')->group(function () {
             Route::get('/meus-estudantes', [TutorController::class, 'index'])->name('estudantes.index');
@@ -205,7 +206,10 @@ Route::middleware(['auth', 'roles:professor,admin,coordenador'])->group(function
     Route::get('/campanhas/estudantes/{campanha}', [CampanhaController::class, 'estudantes'])->name('campanhas.estudantes');
     Route::get('/{id}/historico', [AnteprojetoAdminController::class, 'historicoAnteprojeto'])->name('anteprojetosAdmin.historico');
 
-    
+    //cursos
+     Route::get('/cursos/{curso}/estudantes', [CursoController::class, 'estudantePorCurso'])->name('cursos.estudantes');
+       Route::get('/cursos/{curso}/campanhas', [CampanhaController::class, 'indexPorCurso'])->name('cursos.campanhas');  
+     Route::get('/departamento/cursos/{departamento}/{privado?}', [DepartamentoController::class, 'cursos'])->name('departamento.cursos');
 
 // Rota limpa para abrir a tela direto do menu ou com filtros via GET
     Route::get('/estudante/consulta', [EstudanteConsultaController::class, 'estudantePorCurso'])
@@ -238,6 +242,8 @@ Route::middleware(['auth', 'roles:admin'])->group(function () {
     Route::prefix('admin/relatorios')->group(function () {
         Route::get('/geral', [AdminRelatorioController::class, 'index'])->name('admin.relatorios.geral');
     });
+    Route::get('/admin/usuarios/recentes', [AdminRelatorioController::class, 'usuarios'])
+    ->name('admin.usuarios.recentes');
 });
 
 Route::middleware(['auth', 'roles:coordenador|admin'])->group(function () {
@@ -256,10 +262,9 @@ Route::middleware(['auth', 'roles:coordenador|admin'])->group(function () {
         
         // Departamentos e Cursos
         Route::get('/departamentos/{departamento}/professores', [DepartamentoController::class, 'professorPorDepartamento'])->name('departamentos.professores');
-        Route::get('/cursos/{curso}/campanhas', [CampanhaController::class, 'indexPorCurso'])->name('cursos.campanhas');
+      
         Route::get('/cursos/{curso}/campanhas/create', [CampanhaController::class, 'cursoCampanhaCreate'])->name('cursos.campanhas.create');
-        Route::get('/cursos/{curso}/estudantes', [CursoController::class, 'estudantePorCurso'])->name('cursos.estudantes');
-        Route::get('/departamento/cursos/{departamento}', [DepartamentoController::class, 'cursos'])->name('departamento.cursos');
+       
 
         // Recursos Crud Estruturais
         Route::resource('departamentos', DepartamentoController::class);

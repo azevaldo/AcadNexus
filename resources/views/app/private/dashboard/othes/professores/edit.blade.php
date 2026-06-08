@@ -8,7 +8,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
     <div class="flex items-start gap-4">
         {{-- Botão Voltar Minimalista --}}
-        <a href="{{ url()->previous()  }}"
+        <a href="{{ route('departamentos.index') }}"
    class="mt-1 flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm shrink-0"
    title="Voltar">
     <i class="fas fa-arrow-left"></i>
@@ -48,7 +48,7 @@
                             Nome
                         </label>
  <input type="text"
-       name="nome"
+       name="name"
       value="{{ $professor->user->name }}"
        required
        minlength="3"

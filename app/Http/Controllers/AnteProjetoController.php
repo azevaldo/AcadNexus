@@ -40,8 +40,10 @@ class AnteprojetoController extends Controller
 
         // 4. Eliminar registro no banco
         $versao->delete();
-
-        return back()->with('success', 'Versão eliminada com sucesso!');
+$ante=$versao->anteprojeto;
+$ante ->status=$ante->ultimaVersao->status??'submetido';
+$ante->save();
+return back()->with('success', 'Versão eliminada com sucesso!');
         } catch (\Exception $e) {
             return back()->with('error', 'Ocorreu um erro: ' . $e->getMessage());
         }
@@ -208,8 +210,6 @@ public function meuAnteprojeto($campanha_id)
                     if($hoje->lt($prazoMelhorias)){
                         $fase2=true;
                     }
-                }else{
-                    $fase2='Não definido';
                 }
 
                   // 4. CÁLCULO DOS TOTAIS

@@ -26,7 +26,7 @@ class RelatorioEstudanteController extends Controller
         'anteprojetos_contagem' => $estudante->anteprojetos->count(),
         'temas_ia' => \App\Models\SugestaoTemaIa::where('estudante_id', $estudante->id)->count(),
         'favoritos_ia' => \App\Models\FavoritoTemaIa::where('estudante_id', $estudante->id)->count(),
-        'campanhas_ativas' => $estudante->campanhas->count(),
+        'campanhas_ativas' => $estudante->campanhas()->where('status','aberta')->count(),
     ];
 
     return view('app.private.dashboard.estudantes.relatorios.index', compact('estudante', 'stats'));

@@ -110,7 +110,30 @@
                 <a href="{{ route('areasCientificas.index') }}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Áreas Científicas</a>
                 <a href="{{ route('itensMelhoria.index') }}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Itens Melhorias</a>
                 <a href="{{ route('admin.relatorios.geral') }}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Relatório Geral</a>
-             @endhasanyrole
+                <a href="{{ route('admin.usuarios.recentes') }}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Usuarios</a>
+            
+                @endhasanyrole
+        </div>
+    </div>
+    @endhasanyrole
+
+
+
+        @hasanyrole('professor')
+    <div class="space-y-1">
+        <button @click="openMenu = (openMenu === 'admin2' ? null : 'admin2')" 
+                class="w-full flex items-center justify-between p-3 text-blue-200 hover:bg-blue-800 rounded-xl transition">
+            <div class="flex items-center">
+                <i class="fas fa-tools w-6 text-center text-blue-400"></i>
+                <span class="ml-3 font-medium">Prof + </span>
+            </div>
+            <i class="fas fa-chevron-down text-[10px] transition-transform duration-300" :class="openMenu === 'admin' ? 'rotate-180' : ''"></i>
+        </button>
+        
+        <div x-show="openMenu === 'admin2'" x-collapse x-cloak class="pl-10 space-y-1">
+             <a href="{{ route('professor.departamentos') }}" class="block p-2 text-sm text-blue-300 hover:text-white transition">Meus Departamentos</a>
+            
+             
         </div>
     </div>
     @endhasanyrole
