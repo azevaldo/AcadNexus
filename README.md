@@ -726,15 +726,6 @@ php artisan serve
 
 ---
 
-# 🔌 API REST
-
-O projeto possui comunicação através de **API REST**.
-
-As rotas da API estão organizadas em:
-
-```text
-routes/api.php
-```
 
 Os métodos HTTP utilizados podem incluir:
 
